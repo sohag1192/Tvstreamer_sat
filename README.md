@@ -171,7 +171,30 @@ For detailed configuration instructions, see [OSCAM_MINI.md](OSCAM_MINI.md). The
 - Boost Thread/System, JsonCpp, libcurl, OpenSSL, and libdvbcsa;
 - Linux DVB and Phoenix/SmartMouse hardware (required only when utilizing respective features).
 
-### Building
+### Automated Installation (Ubuntu / Debian)
+
+The easiest way to install TVStreammerSAT5 on Ubuntu (20.04 / 22.04 / 24.04 LTS) or Debian is using the all-in-one installation script:
+
+```bash
+sudo bash install.sh
+```
+
+This single command automatically:
+1. Installs all required packages via `apt` (build tools, GStreamer, Boost, libdvbcsa, pcscd, codecs).
+2. Tunes kernel network socket buffers (`/etc/sysctl.d/99-tvstreammer-udp.conf`) for high-bitrate streaming without packet drop.
+3. Ensures browser streaming assets (`hls.js`, `mpegts.js`) are present in `web/vendor/`.
+4. Compiles the application and plugins with CMake.
+5. Deploys binary, web UI, and plugins to `/opt/TVStreammerSAT5`.
+6. Configures, enables, and starts the `tvstreammersat5.service` systemd service.
+
+Installer options:
+- `sudo bash install.sh --with-oscam` — Also builds and deploys vendored OSCam-mini.
+- `sudo bash install.sh --no-start` — Deploys without immediately starting the service.
+- `sudo bash install.sh -y` — Runs non-interactively.
+
+---
+
+### Manual Building
 
 Install dependencies:
 

@@ -1,4 +1,4 @@
-option(TVSTREAMMERSAT5_BUILD_OSCAM_MINI "Build vendored OSCam-mini" ON)
+option(TVSTREAMMERSAT5_BUILD_OSCAM_MINI "Build vendored OSCam-mini" OFF)
 
 if(TVSTREAMMERSAT5_BUILD_OSCAM_MINI)
   set(OSCAM_MINI_SOURCE_DIR "${CMAKE_SOURCE_DIR}/third_party/oscam-mini")

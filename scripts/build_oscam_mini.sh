@@ -44,10 +44,12 @@ printf '\nEnabled OSCam-mini modules:\n'
 # Build via OSCam's CMakeLists instead of relying on the upstream root Makefile.
 # This also avoids failures when an archive was unpacked through Windows and file
 # permissions or the Makefile were lost.
+OSCAM_CFLAGS="-w -Wno-error=incompatible-pointer-types -Wno-error=int-conversion -Wno-error=implicit-function-declaration -Wno-error=return-mismatch"
 cmake -S "$WORK" -B "$BUILD" \
   -DCMAKE_BUILD_TYPE=Release \
   -DHAVE_PCSC=1 \
-  -DCS_CONFDIR=/opt/TVStreammerSAT5/oscam-mini/config
+  -DCS_CONFDIR=/opt/TVStreammerSAT5/oscam-mini/config \
+  -DCMAKE_C_FLAGS="${OSCAM_CFLAGS}"
 # Detect any unexpected configure fallback to non-PC/SC mode.
 if ! grep -Eq '(^CONFIG_CARDREADER_PCSC=y$|^USE_PCSC[=: ]|^WITH_PCSC[=: ]|^HAVE_PCSC(:INTERNAL|:UNINITIALIZED|:BOOL)?=1$)' \
      "$WORK/config.mak" "$BUILD/config.mak" "$BUILD/CMakeCache.txt" 2>/dev/null; then

@@ -3375,6 +3375,10 @@ header{position:fixed;top:0;left:0;right:0;z-index:100000;overflow:visible;displ
 .header-monitor .metric span{color:#7dd1ff;font-weight:700}
 .header-monitor .status span{color:#fff;font-weight:700}
 .header-right{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lang-switch-group{display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.14);border-radius:999px;background:rgba(255,255,255,.05);overflow:hidden;padding:2px}
+.lang-btn{border:none;background:transparent;color:#a0aec0;font-size:.78rem;font-weight:700;padding:4px 8px;border-radius:999px;cursor:pointer;line-height:1;transition:all .15s ease}
+.lang-btn:hover{color:#fff;background:rgba(255,255,255,.08)}
+.lang-btn.active{background:#1f8bff;color:#fff}
 .restart-button{border-color:rgba(255,184,77,.28);color:#ffe0a3;background:rgba(255,184,77,.1)}
 .restart-button:hover{background:rgba(255,184,77,.2);border-color:rgba(255,184,77,.38)}
 .restart-button:disabled{opacity:.65;cursor:wait}
@@ -3622,7 +3626,7 @@ header{position:fixed;top:0;left:0;right:0;z-index:100000;overflow:visible;displ
 <header>
 <div class="header-left">
 <div class="header-title-block">
-<div class="title">Control Panel</div>
+<div class="title" data-i18n="controlPanel">Control Panel</div>
 <div class="server-name" id="headerServerName">TVStreammerSAT5</div>
 </div>
 <div class="header-monitor">
@@ -3637,7 +3641,11 @@ header{position:fixed;top:0;left:0;right:0;z-index:100000;overflow:visible;displ
 </div>
 </div>
 <div class="header-right">
-<button class="button-secondary" onclick="toggleLanguage()" id="languageButton">RU</button>
+<div class="lang-switch-group" id="languageSelector" title="Language / Язык">
+<button type="button" class="lang-btn" id="langBtnEn" onclick="setLanguage('en')">EN</button>
+<button type="button" class="lang-btn" id="langBtnRu" onclick="setLanguage('ru')">RU</button>
+</div>
+<button class="button-secondary" onclick="toggleLanguage()" id="languageButton" style="display:none"></button>
 <details class="system-menu" id="systemMenu">
 <summary class="button-secondary" data-i18n="system">System</summary>
 <div class="system-menu-list">
@@ -3666,50 +3674,46 @@ header{position:fixed;top:0;left:0;right:0;z-index:100000;overflow:visible;displ
 <script>
 const translations = {
   en: {
-    subtitle:'Broadcast monitoring and stream control', total:'Total:', active:'Active:', network:'Network', system:'System', user:'User', addStream:'+ Add stream', addChannel:'+ Add channel',
+    controlPanel:'Control Panel', subtitle:'Broadcast monitoring and stream control', total:'Total:', active:'Active:', network:'Network', system:'System', user:'User', addStream:'+ Add stream', addChannel:'+ Add channel',
     interfacesNotFound:'No interfaces found', output:'Output', activeInput:'Active input', primary:'Primary', backup:'Backup', sid:'SID', bitrateIn:'Bitrate In', bitrateOut:'Bitrate Out', status:'Status',
     online:'Online', backupOnline:'Backup', offline:'Offline', start:'Start', stop:'Stop', edit:'Edit', chart:'Chart', delete:'Delete stream', removeConfirm:'Delete stream',
     restartProgram:'Full program restart', restartConfirm:'Fully restart TVStreammerSAT5 service now?', restarting:'Restarting service...',
     networkLoad:'Network interface load', interface:'Interface', incoming:'Incoming', outgoing:'Outgoing', close:'Close',
-    about:'About', product:'Product', version:'Version', name:'Name', country:'Country', contactEmail:'Contact email', donate:'Donate', donateQr:'Donate QR code', donateWallet:'Telegram Wallet', cancel:'Cancel', save:'Save', userTitle:'User', telegram:'Telegram API', quality:'Stream quality', playlist:'VLC playlist', subscribers:'Subscribers', streams:'Streams', filtering:'Enable IP filtering', addSubscriber:'Add subscriber', primaryIp:'Primary IP', backupIp:'Backup IP', addedAt:'Added at', subscriberName:'Subscriber name', noSubscribers:'No subscribers added', noStreams:'No streams configured', enabled:'Enabled', disabled:'Disabled', exportSubscribers:'Export TXT', session:'Session', activeSession:'Online', offlineSession:'Offline', resetSession:'Reset'
+    about:'About', product:'Product', version:'Version', name:'Name', country:'Country', contactEmail:'Contact email', donate:'Donate', donateQr:'Donate QR code', donateWallet:'Telegram Wallet', cancel:'Cancel', save:'Save', userTitle:'User', telegram:'Telegram API', quality:'Stream quality', playlist:'VLC playlist', subscribers:'Subscribers', streams:'Streams', filtering:'Enable IP filtering', addSubscriber:'Add subscriber', primaryIp:'Primary IP', backupIp:'Backup IP', addedAt:'Added at', subscriberName:'Subscriber name', noSubscribers:'No subscribers added', noStreams:'No streams configured', enabled:'Enabled', disabled:'Disabled', exportSubscribers:'Export TXT', session:'Session', activeSession:'Online', offlineSession:'Offline', resetSession:'Reset',
+    decoding:'Decoding', doubleClickPreview:'Double-click to preview', unavailable:'unavailable', refresh:'Refresh',
+    connectionMonitoring:'Unregistered connections', monitoringHint:'HTTP, HLS and SRT sessions are visible. UDP receivers cannot be detected.', clientIp:'Client IP', protocol:'Protocol', connections:'Connections', actions:'Actions', addFromConnection:'Add', blockClient:'Block', blockedIps:'Blocked IPs', unblockClient:'Unblock', noUnknownConnections:'No unregistered connections', streamNumber:'Stream',
+    addChannelDvbTitle:'Add Channel — DVB-S/S2', signal:'Signal', adapter:'Adapter', frontend:'Frontend', frequency:'Frequency, MHz', symbolRate:'Symbol Rate, kSym/s', polarity:'Polarization', polarityH:'H — Horizontal', polarityV:'V — Vertical', standard:'Standard', modulation:'Modulation', fec:'FEC', diseqcSource:'DiSEqC source', streamId:'ISI / Stream ID', scanning:'Scanning', holdLock:'Hold LOCK', searchingDvb:'Searching for DVB frontend...', camClientsTitle:'CAM clients / Newcamd', loadingCamClients:'Loading CAM clients...', camForScrambled:'CAM for scrambled channels', doNotUseCam:'Do not use CAM / FTA', camHelpText:'Select the CAM client used to descramble saved encrypted services. Configure Newcamd/OSCam in System / Newcamd.', scanChannels:'Scan channels', found:'Found:', clickScanChannels:'Click "Scan channels".', multicastIp:'Multicast / IP', firstUdpPort:'First UDP port', cbrBitrateKbps:'CBR bitrate, kbit/s', outputInterface:'Output interface', autoSystemRoute:'Auto (system routing)', autoStart:'Auto-start', startAfterRestart:'Start created channels after service restart', saveSelected:'Save selected', selectAtLeastOne:'Select at least one channel.', channel:'Channel', provider:'Provider', access:'Access', scrambledBadge:'CA', scrambledTitle:'Scrambled channel (CA)', pmtPendingBadge:'CHECK', pmtPendingTitle:'PMT/PID not yet acquired', ftaTitle:'Free-to-air channel (FTA)', noChannelsFound:'No channels found. Check frequency, Symbol Rate, polarization, and signal level.', scanningDevice:'Scanning', saveChannelsFailed:'Failed to save satellite channels',
+    editStreamTitle:'Edit Stream', addStreamTitle:'Stream Configuration', tileName:'Tile Name', inputUrlPrimary:'Input URL (Primary)', inputInterface:'Input Interface', autoAllInterfaces:'Auto / all interfaces', inputMode:'Input Mode', httpHlsAccess:'HTTP / HLS Access', noKey:'No key',
+    keyHelpText:'Key is specific to this channel. Auto: *.m3u8 opens as HLS, other HTTP/HTTPS URLs open as single-request MPEG-TS. For HLS without .m3u8 select HLS mode manually. For HTTP MPEG-TS the key is applied to the single request; for HLS — to manifest, variant playlist, segments and EXT-X-KEY. If key is already in URL, leave "No key". For Authorization specify the full value, e.g. Bearer xxxxx.',
+    hlsSync:'HLS Synchronization', providerPcrClock:'Provider PCR clock (manual mode)', providerPcrClockHelp:'For channels like TV3: after stabilization provider PCR becomes a fixed media clock. Transport PCR remains synthetic 20 ms.', providerPcrDeadlineShaper:'Provider PCR deadline shaper (manual mode)', providerPcrDeadlineShaperHelp:'203.41: For HLS with large VBR bursts between provider PCR. The shaper uses a 750 ms lookahead window to pace bursts across earlier CBR slots without exceeding the stream limit. Outgoing UDP remains CBR with synthetic PCR 20 ms and NULL stuffing. Do not enable together with Provider PCR clock.',
+    camClientRow:'CAM client (scrambled DVB)', camClientHelp:'Select a CAM/Newcamd client for encrypted DVB services. FTA streams do not use this setting.', backupSource:'Backup / Replacement File', backupUrl:'Backup URL', replacementFile:'Replacement file', selectUploadedFile:'Select previously uploaded file', loopReplacementFile:'Loop replacement file', loopUntilPrimary:'Repeat until primary stream recovers', testPattern:'Test pattern', useInsteadOfInputs:'Use instead of input streams', outputInterfaceLabel:'Output interface', outputFormats:'Output formats', addFormat:'+ Add format', inputSid:'Input SID', inputSidHelp:'0 = auto-detect SID from PAT; 1–65535 = select specific input program.', outputSid:'Output SID', channelNameProvider:'Channel Name & Provider', targetBitrateCbr:'Target bitrate (kbit/s, for CBR)', transcoding:'Transcoding', transcodingHelp:'Process video/audio: transcoding or independent pass-through of original streams', hlsArchiveDvr:'HLS Archive (DVR)', recordArchive:'Record archive', hours:'hours', hlsArchiveHelp:'Archive saves HLS TS segments to disk. Compatible URLs: /CHANNEL/archive-UTC-DURATION.m3u8, /CHANNEL/rewind-SECONDS.m3u8, /CHANNEL/timeshift_rel-SECONDS.m3u8, /CHANNEL/timeshift_abs-UTC.m3u8.', transcodeParams:'Transcoding Parameters', videoH264Transcode:'Video: H.264 transcoding', videoPassThrough:'Video: pass-through original stream', encoderAuto:'Encoder: Auto (NVENC → Intel → x264)', encoderNvenc:'Encoder: NVIDIA NVENC', encoderIntel:'Encoder: Intel Quick Sync / VA', encoderX264:'Encoder: CPU x264', audioPassThrough:'Audio: pass-through original track', audioAac:'Audio: AAC-LC', audioMp3:'Audio: MP3', kbitCbr:'kbit/s CBR', audio:'audio', transcodeNote:'202.79: H.264 supports NVIDIA NVENC, Intel Quick Sync/VA and CPU x264. Auto: NVENC → Intel → x264. 576i/1080i is deinterlaced via YADIF on all fields preserving 50 Hz motion; SPS/PPS repeated on every IDR.', autoStartStream:'Auto-start', autoStartStreamHelp:'Start automatically after service restart', enableCbr:'Enable CBR', cbrHelp:'CBR is supported for UDP, HTTP, HLS and SRT.', enableRemap:'Enable Remap', remapHelp:'For MPEG-TS: input SID 0 = auto-detect program from PAT; non-zero SID selects specific program. Output SID is used for PAT/PMT/SDT Remap. V-PID and A-PID set output PIDs.',
+    primaryFormat:'Primary format', additionalFormat:'Secondary format', srtMode:'SRT mode', outputAddress:'Output address', port:'Port', primaryInterface:'Primary interface', inheritInterface:'Same as primary', urlForPlayer:'Player URL', linkAfterSave:'Link will appear after saving', hostLabelHttp:'Link address / host', portLabelHls:'HLS port', portLabelHttp:'HTTP port', hostPlaceholderDns:'Interface IP or DNS', hostLabelRtp:'RTP IP / Multicast', portLabelRtp:'RTP port', hostLabelSrtCaller:'SRT server', hostLabelSrtListener:'SRT host for link', portLabelSrt:'SRT port', hostPlaceholderSrtCaller:'server.example.com or IP', hostPlaceholderSrtListener:'0.0.0.0 for listener', hostLabelRtsp:'RTSP server', portLabelRtsp:'RTSP port', hostLabelUdp:'Multicast / UDP IP', cbrHintNetwork:'CBR MPEG-TS for HTTP/HLS/SRT: NULL stuffing + PAT/PMT/PCR; HTTP/SRT additionally sync to PCR.', cbrHintUdp:'UDP CBR uses StableUdpOutput; UDP VBR follows input bitrate.', cbrHintNotApplicable:'CBR is not applicable for this output type.', replacementPlaceholder:'/path/to/replacement.ts or upload file below', testPatternShort:'Test', replacementFileShort:'Fallback file',
+    newPassword:'New password', newPasswordPlaceholder:'Leave blank to keep unchanged', serverName:'Server name', webPort:'Web interface port', srtVpsLabel:'SRT for VPS/VDS', srtVpsOptimization:'Optimize SRT for VPS/VDS/containers', srtVpsHelp:'203.67: Sets 1500 ms latency, 1500 ms rcvlatency/peerlatency, 16 MiB SRT buffers, 32768 packets FC, and 2000 ms poll-timeout for all SRT inputs/outputs. Recommended on VPS/VDS virtual networks; keep disabled on physical LAN servers.',
+    mptsHint:'Dedicated batch multiplexer combines selected output SPTS into a single MPTS MPEG-TS. Media packet PCR/PTS/DTS timestamps are preserved; original PAT/PMT/SDT tables are replaced with a unified MPTS table, and channel null packets are stripped.', mptsOutputs:'MPTS Outputs', addMpts:'+ Add MPTS', mptsEmpty:'No MPTS outputs created yet', editMpts:'Edit MPTS', newMpts:'New MPTS', destIp:'Destination IP', outputInterfaceMpts:'Output Interface', mptsAutoStart:'Auto-start MPTS', mptsChannels:'MPTS Channels', mptsSidHint:'SID = 0 means automatic numbering from base SID. Service order follows channel order in configuration.', advancedPsi:'Advanced PSI Parameters', baseSid:'Base SID', basePmtPid:'Base PMT PID', back:'Back', mptsServicesSuffix:'services', running:'Running', stopped:'Stopped',
+    streamQuality:'Stream Quality', outgoingStream:'Outgoing stream', autoRefresh:'Auto-refresh', legend:'Legend', legendGreen:'Green — Input bitrate (left axis Mbit/s).', legendBlue:'Blue — Selected outgoing stream bitrate (left axis Mbit/s).', legendOrange:'Orange bars — Input CC-errors count per history interval (right axis).', legendPink:'Pink bars — Total output MPEG-TS CC-errors before splitting per history interval.', legendCcNote:'CC-errors are tracked using cumulative counters between consecutive points; errors within 30-second windows are preserved.', legendClick:'Click on chart to copy image to clipboard.', noData:'No data', historyEmptyWaiting:'History is empty. Data will appear after several state updates.', historyCollectedInMemory:'History is recorded in memory while the server runs.',
+    previewDialogAria:'HTTP stream preview', connectingHttpPreview:'Connecting to HTTP stream…', closePreview:'Close preview'
   },
   ru: {
-    subtitle:'Мониторинг трансляций и управление потоками', total:'Всего:', active:'Активно:', network:'Сеть', system:'Система', user:'Пользователь', addStream:'+ Добавить поток', addChannel:'+ Добавить канал',
+    controlPanel:'Панель управления', subtitle:'Мониторинг трансляций и управление потоками', total:'Всего:', active:'Активно:', network:'Сеть', system:'Система', user:'Пользователь', addStream:'+ Добавить поток', addChannel:'+ Добавить канал',
     interfacesNotFound:'Интерфейсы не найдены', output:'Вывод', activeInput:'Активный вход', primary:'Основной', backup:'Резерв', sid:'SID', bitrateIn:'Bitrate In', bitrateOut:'Bitrate Out', status:'Статус',
     online:'Онлайн', backupOnline:'Резерв', offline:'Офлайн', start:'Старт', stop:'Стоп', edit:'Ред.', chart:'График', delete:'Удалить поток', removeConfirm:'Удалить поток',
     restartProgram:'Полный перезапуск программы', restartConfirm:'Полностью перезапустить TVStreammerSAT5 через systemd?', restarting:'Перезапуск программы...',
     networkLoad:'Загрузка сетевых интерфейсов', interface:'Интерфейс', incoming:'Входящий', outgoing:'Исходящий', close:'Закрыть',
-    about:'О программе', product:'Программа', version:'Версия', name:'Имя', country:'Страна', contactEmail:'Эл. почта', donate:'Донат', donateQr:'QR-код доната', donateWallet:'Telegram-кошелёк', cancel:'Отмена', save:'Сохранить', userTitle:'Пользователь', telegram:'Telegram API', quality:'Качество потока', playlist:'Плейлист VLC', subscribers:'Абоненты', streams:'Потоки', filtering:'Включить фильтрацию по IP', addSubscriber:'Добавить абонента', primaryIp:'Основной IP', backupIp:'Резервный IP', addedAt:'Дата добавления', subscriberName:'Наименование абонента', noSubscribers:'Абоненты не добавлены', noStreams:'Потоки не настроены', enabled:'Включен', disabled:'Отключен', exportSubscribers:'Экспорт TXT', session:'Сессия', activeSession:'Онлайн', offlineSession:'Офлайн', resetSession:'Сбросить'
+    about:'О программе', product:'Программа', version:'Версия', name:'Имя', country:'Страна', contactEmail:'Эл. почта', donate:'Донат', donateQr:'QR-код доната', donateWallet:'Telegram-кошелёк', cancel:'Отмена', save:'Сохранить', userTitle:'Пользователь', telegram:'Telegram API', quality:'Качество потока', playlist:'Плейлист VLC', subscribers:'Абоненты', streams:'Потоки', filtering:'Включить фильтрацию по IP', addSubscriber:'Добавить абонента', primaryIp:'Основной IP', backupIp:'Резервный IP', addedAt:'Дата добавления', subscriberName:'Наименование абонента', noSubscribers:'Абоненты не добавлены', noStreams:'Потоки не настроены', enabled:'Включен', disabled:'Отключен', exportSubscribers:'Экспорт TXT', session:'Сессия', activeSession:'Онлайн', offlineSession:'Офлайн', resetSession:'Сбросить',
+    decoding:'Декодирование', doubleClickPreview:'Двойной клик — предпросмотр', unavailable:'недоступен', refresh:'Обновить',
+    connectionMonitoring:'Незарегистрированные подключения', monitoringHint:'Видны сессии HTTP, HLS и SRT. Получателей UDP определить нельзя.', clientIp:'IP клиента', protocol:'Протокол', connections:'Подключения', actions:'Действия', addFromConnection:'Добавить', blockClient:'Заблокировать', blockedIps:'Заблокированные IP', unblockClient:'Разблокировать', noUnknownConnections:'Незарегистрированных подключений нет', streamNumber:'Поток',
+    addChannelDvbTitle:'Добавить канал — DVB-S/S2', signal:'Сигнал', adapter:'Adapter', frontend:'Frontend', frequency:'Частота, MHz', symbolRate:'Symbol Rate, kSym/s', polarity:'Поляризация', polarityH:'H — Horizontal', polarityV:'V — Vertical', standard:'Стандарт', modulation:'Модуляция', fec:'FEC', diseqcSource:'DiSEqC source', streamId:'ISI / Stream ID', scanning:'Сканирование', holdLock:'Удерживать LOCK', searchingDvb:'Поиск DVB frontend...', camClientsTitle:'CAM-клиенты / Newcamd', loadingCamClients:'Загрузка CAM-клиентов...', camForScrambled:'CAM для кодированных каналов', doNotUseCam:'Не использовать CAM / FTA', camHelpText:'Выберите CAM-клиент для декодирования сохранённых кодированных сервисов. Настройте Newcamd/OSCam в Система / Newcamd.', scanChannels:'Сканировать каналы', found:'Найдено:', clickScanChannels:'Нажмите «Сканировать каналы».', multicastIp:'Multicast / IP', firstUdpPort:'Первый UDP порт', cbrBitrateKbps:'CBR bitrate, кбит/с', outputInterface:'Выходной интерфейс', autoSystemRoute:'Авто (системный маршрут)', autoStart:'Автозапуск', startAfterRestart:'Запускать созданные каналы после перезапуска', saveSelected:'Сохранить выбранные', selectAtLeastOne:'Выберите хотя бы один канал.', channel:'Канал', provider:'Провайдер', access:'Доступ', scrambledBadge:'КОД.', scrambledTitle:'Кодированный канал (CA)', pmtPendingBadge:'ПРОВ.', pmtPendingTitle:'PMT/PID ещё не получены', ftaTitle:'Открытый канал (FTA)', noChannelsFound:'Каналы не найдены. Проверьте частоту, Symbol Rate, поляризацию и уровень сигнала.', scanningDevice:'Сканирование', saveChannelsFailed:'Не удалось сохранить спутниковые каналы',
+    editStreamTitle:'Редактирование трансляции', addStreamTitle:'Настройка трансляции', tileName:'Имя плитки', inputUrlPrimary:'Входной URL (Основной)', inputInterface:'Интерфейс входа', autoAllInterfaces:'Auto / все интерфейсы', inputMode:'Режим входа', httpHlsAccess:'HTTP / HLS доступ', noKey:'Без ключа',
+    keyHelpText:'Ключ индивидуален для этого канала. Auto: URL *.m3u8 открывается как HLS, остальные HTTP/HTTPS URL — как single-request MPEG-TS. Для HLS без .m3u8 выбери режим HLS вручную. Для HTTP MPEG-TS ключ применяется к единственному запросу; для HLS — к manifest, variant playlist, сегментам и EXT-X-KEY. Если ключ уже находится в URL, оставь «Без ключа». Для Authorization указывай полное значение, например Bearer xxxxx.',
+    hlsSync:'HLS синхронизация', providerPcrClock:'Provider PCR clock (ручной режим)', providerPcrClockHelp:'Для каналов вроде TV3: после стабилизации provider PCR становится фиксированным media clock. Транспортный PCR остаётся синтетическим 20 ms.', providerPcrDeadlineShaper:'Provider PCR deadline shaper (ручной режим)', providerPcrDeadlineShaperHelp:'203.41: для HLS с сильными VBR burst между provider PCR. Шейпер держит ограниченный lookahead 750 ms, заранее видит будущие PCR deadlines и распределяет burst по предыдущим свободным CBR-слотам, не превышая полезный потолок выхода. В output-path нет ожидания PCR, нет feedback PLL и catch-up. Внешний UDP остаётся CBR с synthetic PCR 20 ms и NULL stuffing. Не включать вместе с Provider PCR clock.',
+    camClientRow:'CAM-клиент (кодированный DVB)', camClientHelp:'Выберите CAM/Newcamd клиент для кодированных DVB-сервисов. Для FTA-потоков не используется.', backupSource:'Резерв / файл замены', backupUrl:'URL резерва', replacementFile:'Файл замены', selectUploadedFile:'Выбрать ранее загруженный файл', loopReplacementFile:'Зациклить файл замены', loopUntilPrimary:'Повторять до появления основного потока', testPattern:'Тестовая таблица', useInsteadOfInputs:'Использовать вместо входных потоков', outputInterfaceLabel:'Интерфейс вывода', outputFormats:'Выходные форматы', addFormat:'+ Добавить формат', inputSid:'SID входа', inputSidHelp:'0 = автоопределение SID из PAT; значение 1–65535 = выбрать конкретный входной канал.', outputSid:'SID выхода', channelNameProvider:'Имя Канала и Провайдер', targetBitrateCbr:'Target bitrate (кбит/с, для CBR)', transcoding:'Транскодирование', transcodingHelp:'Обрабатывать видео/аудио: транскодирование или независимый проброс оригинальных потоков', hlsArchiveDvr:'HLS архив (DVR)', recordArchive:'Записывать архив', hours:'часов', hlsArchiveHelp:'Архив сохраняет HLS TS-сегменты на диск. Совместимые URL: /КАНАЛ/archive-UTC-ДЛИТЕЛЬНОСТЬ.m3u8, /КАНАЛ/rewind-СЕКУНДЫ.m3u8, /КАНАЛ/timeshift_rel-СЕКУНДЫ.m3u8, /КАНАЛ/timeshift_abs-UTC.m3u8.', transcodeParams:'Параметры транскодирования', videoH264Transcode:'Видео: H.264 транскодирование', videoPassThrough:'Видео: проброс оригинального потока', encoderAuto:'Кодировщик: Auto (NVENC → Intel → x264)', encoderNvenc:'Кодировщик: NVIDIA NVENC', encoderIntel:'Кодировщик: Intel Quick Sync / VA', encoderX264:'Кодировщик: CPU x264', audioPassThrough:'Аудио: проброс оригинальной дорожки', audioAac:'Аудио: AAC-LC', audioMp3:'Аудио: MP3', kbitCbr:'кбит/с CBR', audio:'аудио', transcodeNote:'202.79: H.264 поддерживает NVIDIA NVENC, Intel Quick Sync/VA и CPU x264. Auto: NVENC → Intel → x264. Интерлейс 576i/1080i деинтерлейсится YADIF по всем полям с сохранением 50 Гц движения; SPS/PPS повторяются на каждом IDR.', autoStartStream:'Автозапуск', autoStartStreamHelp:'Запускать после перезапуска программы', enableCbr:'Включить CBR', cbrHelp:'CBR поддерживается для UDP, HTTP, HLS и SRT.', enableRemap:'Включить Remap', remapHelp:'Для MPEG-TS: SID входа 0 = автоопределение программы из PAT; ненулевой SID выбирает конкретный входной канал. SID выхода всегда задаётся отдельно и используется для Remap в PAT/PMT/SDT. V-PID и A-PID задают выходные PID.',
+    primaryFormat:'Основной формат', additionalFormat:'Доп. формат', srtMode:'SRT режим', outputAddress:'Адрес выхода', port:'Порт', primaryInterface:'Основной интерфейс', inheritInterface:'Как основной', urlForPlayer:'URL для плеера', linkAfterSave:'Ссылка появится после сохранения', hostLabelHttp:'Адрес для ссылки', portLabelHls:'HLS порт', portLabelHttp:'HTTP порт', hostPlaceholderDns:'IP интерфейса или DNS', hostLabelRtp:'RTP IP / мультикаст', portLabelRtp:'RTP порт', hostLabelSrtCaller:'SRT сервер', hostLabelSrtListener:'SRT host для ссылки', portLabelSrt:'SRT порт', hostPlaceholderSrtCaller:'server.example.com или IP', hostPlaceholderSrtListener:'0.0.0.0 для listener', hostLabelRtsp:'RTSP сервер', portLabelRtsp:'RTSP порт', hostLabelUdp:'Мультикаст / UDP IP', cbrHintNetwork:'CBR MPEG-TS для HTTP/HLS/SRT: NULL stuffing + PAT/PMT/PCR; HTTP/SRT дополнительно синхронизируются по PCR.', cbrHintUdp:'UDP CBR использует StableUdpOutput; UDP VBR следует входному битрейту.', cbrHintNotApplicable:'CBR для этого типа выхода не применяется.', replacementPlaceholder:'/path/to/replacement.ts или загрузите файл ниже', testPatternShort:'Тест', replacementFileShort:'Файл замены',
+    newPassword:'Новый пароль', newPasswordPlaceholder:'Оставьте пустым, чтобы не менять', serverName:'Имя сервера', webPort:'Порт web-интерфейса', srtVpsLabel:'SRT для VPS/VDS', srtVpsOptimization:'Оптимизация SRT для VPS/VDS/контейнеров', srtVpsHelp:'203.67: включает для всех SRT-входов и выходов latency 1500 ms, rcvlatency/peerlatency 1500 ms, SRT RX/TX buffers 16 MiB, FC 32768 пакетов и poll-timeout 2000 ms. Использовать на VPS/VDS с виртуальной сетью; на обычном LAN/физическом сервере оставлять выключенным.',
+    mptsHint:'Отдельный пакетный мультиплексор объединяет выбранные выходные SPTS в один MPEG-TS. PCR/PTS/DTS медиапакетов не переписываются; исходные PAT/PMT/SDT заменяются общей таблицей MPTS, null-пакеты отдельных каналов отбрасываются.', mptsOutputs:'MPTS-выходы', addMpts:'+ Добавить MPTS', mptsEmpty:'MPTS-выходы ещё не созданы', editMpts:'Редактирование MPTS', newMpts:'Новый MPTS', destIp:'IP назначения', outputInterfaceMpts:'Интерфейс выхода', mptsAutoStart:'Автозапуск MPTS', mptsChannels:'Каналы MPTS', mptsSidHint:'SID = 0 означает автоматическую нумерацию от базового SID. Порядок сервисов соответствует порядку каналов в конфигурации.', advancedPsi:'Расширенные параметры PSI', baseSid:'Базовый SID', basePmtPid:'Базовый PMT PID', back:'Назад', mptsServicesSuffix:'сервисов', running:'Работает', stopped:'Остановлен',
+    streamQuality:'Качество потока', outgoingStream:'Исходящий поток', autoRefresh:'Автообновление', legend:'Расшифровка', legendGreen:'Зеленый — входной bitrate по левой шкале Mbit/s.', legendBlue:'Синий — bitrate выбранного исходящего потока по левой шкале Mbit/s.', legendOrange:'Оранжевые столбцы — количество входных CC-errors за интервал истории по правой шкале.', legendPink:'Розовые столбцы — CC-errors общего выходного MPEG-TS до разветвления за интервал истории.', legendCcNote:'CC-errors считаются по накопительным счетчикам между соседними точками истории; ошибки внутри 30-секундного интервала больше не теряются.', legendClick:'Клик по графику копирует картинку графика.', noData:'Нет данных', historyEmptyWaiting:'История пока пустая. Данные появятся после нескольких обновлений состояния.', historyCollectedInMemory:'История собирается в памяти во время работы программы.',
+    previewDialogAria:'HTTP-предпросмотр потока', connectingHttpPreview:'Подключение к HTTP-потоку…', closePreview:'Закрыть предпросмотр'
   }
 };
-Object.assign(translations.en, {
-  connectionMonitoring:'Unregistered connections',
-  monitoringHint:'HTTP, HLS and SRT sessions are visible. UDP receivers cannot be detected.',
-  clientIp:'Client IP',
-  protocol:'Protocol',
-  connections:'Connections',
-  actions:'Actions',
-  addFromConnection:'Add',
-  blockClient:'Block',
-  blockedIps:'Blocked IPs',
-  unblockClient:'Unblock',
-  noUnknownConnections:'No unregistered connections',
-  streamNumber:'Stream'
-});
-Object.assign(translations.ru, {
-  connectionMonitoring:'\u041d\u0435\u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f',
-  monitoringHint:'\u0412\u0438\u0434\u043d\u044b \u0441\u0435\u0441\u0441\u0438\u0438 HTTP, HLS \u0438 SRT. \u041f\u043e\u043b\u0443\u0447\u0430\u0442\u0435\u043b\u0435\u0439 UDP \u043e\u043f\u0440\u0435\u0434\u0435\u043b\u0438\u0442\u044c \u043d\u0435\u043b\u044c\u0437\u044f.',
-  clientIp:'IP \u043a\u043b\u0438\u0435\u043d\u0442\u0430',
-  protocol:'\u041f\u0440\u043e\u0442\u043e\u043a\u043e\u043b',
-  connections:'\u041f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u044f',
-  actions:'\u0414\u0435\u0439\u0441\u0442\u0432\u0438\u044f',
-  addFromConnection:'\u0414\u043e\u0431\u0430\u0432\u0438\u0442\u044c',
-  blockClient:'\u0417\u0430\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u0442\u044c',
-  blockedIps:'\u0417\u0430\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0435 IP',
-  unblockClient:'\u0420\u0430\u0437\u0431\u043b\u043e\u043a\u0438\u0440\u043e\u0432\u0430\u0442\u044c',
-  noUnknownConnections:'\u041d\u0435\u0437\u0430\u0440\u0435\u0433\u0438\u0441\u0442\u0440\u0438\u0440\u043e\u0432\u0430\u043d\u043d\u044b\u0445 \u043f\u043e\u0434\u043a\u043b\u044e\u0447\u0435\u043d\u0438\u0439 \u043d\u0435\u0442',
-  streamNumber:'\u041f\u043e\u0442\u043e\u043a'
-});
 function normalizeLanguage(value) {
   return value === 'ru' ? 'ru' : 'en';
 }
@@ -3717,21 +3721,30 @@ let language = normalizeLanguage(localStorage.getItem('tvstreammersat5-language'
 const donateAddress = 'UQD1uQn5WxhzKLXjL0KOVuJDcRU65pYzgt6pm_gzJM-vT-cN';
 const donateQrPath = 'M4 4h7v1H4zM12 4h1v1H12zM14 4h3v1H14zM25 4h3v1H25zM30 4h7v1H30zM4 5h1v1H4zM10 5h1v1H10zM13 5h1v1H13zM15 5h1v1H15zM17 5h2v1H17zM20 5h3v1H20zM26 5h1v1H26zM28 5h1v1H28zM30 5h1v1H30zM36 5h1v1H36zM4 6h1v1H4zM6 6h3v1H6zM10 6h1v1H10zM12 6h3v1H12zM16 6h1v1H16zM18 6h2v1H18zM22 6h1v1H22zM25 6h2v1H25zM28 6h1v1H28zM30 6h1v1H30zM32 6h3v1H32zM36 6h1v1H36zM4 7h1v1H4zM6 7h3v1H6zM10 7h1v1H10zM14 7h1v1H14zM16 7h1v1H16zM18 7h1v1H18zM20 7h1v1H20zM22 7h1v1H22zM24 7h2v1H24zM27 7h2v1H27zM30 7h1v1H30zM32 7h3v1H32zM36 7h1v1H36zM4 8h1v1H4zM6 8h3v1H6zM10 8h1v1H10zM14 8h11v1H14zM26 8h2v1H26zM30 8h1v1H30zM32 8h3v1H32zM36 8h1v1H36zM4 9h1v1H4zM10 9h1v1H10zM12 9h1v1H12zM15 9h1v1H15zM20 9h1v1H20zM22 9h1v1H22zM24 9h1v1H24zM26 9h1v1H26zM30 9h1v1H30zM36 9h1v1H36zM4 10h7v1H4zM12 10h1v1H12zM14 10h1v1H14zM16 10h1v1H16zM18 10h1v1H18zM20 10h1v1H20zM22 10h1v1H22zM24 10h1v1H24zM26 10h1v1H26zM28 10h1v1H28zM30 10h7v1H30zM13 11h1v1H13zM16 11h1v1H16zM22 11h1v1H22zM27 11h2v1H27zM4 12h1v1H4zM6 12h1v1H6zM10 12h2v1H10zM14 12h2v1H14zM17 12h1v1H17zM19 12h1v1H19zM21 12h1v1H21zM23 12h1v1H23zM25 12h1v1H25zM27 12h2v1H27zM31 12h1v1H31zM34 12h1v1H34zM36 12h1v1H36zM4 13h2v1H4zM9 13h1v1H9zM11 13h3v1H11zM16 13h1v1H16zM18 13h2v1H18zM24 13h3v1H24zM28 13h3v1H28zM35 13h2v1H35zM5 14h2v1H5zM10 14h1v1H10zM15 14h1v1H15zM17 14h7v1H17zM25 14h1v1H25zM27 14h2v1H27zM30 14h2v1H30zM34 14h1v1H34zM36 14h1v1H36zM6 15h3v1H6zM11 15h1v1H11zM16 15h1v1H16zM18 15h3v1H18zM22 15h3v1H22zM26 15h2v1H26zM29 15h5v1H29zM35 15h2v1H35zM6 16h1v1H6zM8 16h1v1H8zM10 16h1v1H10zM17 16h6v1H17zM24 16h1v1H24zM30 16h2v1H30zM33 16h2v1H33zM36 16h1v1H36zM4 17h3v1H4zM8 17h2v1H8zM13 17h1v1H13zM15 17h1v1H15zM18 17h1v1H18zM20 17h3v1H20zM24 17h2v1H24zM27 17h5v1H27zM33 17h1v1H33zM35 17h1v1H35zM4 18h2v1H4zM8 18h3v1H8zM12 18h2v1H12zM15 18h2v1H15zM18 18h1v1H18zM20 18h1v1H20zM22 18h1v1H22zM24 18h4v1H24zM30 18h1v1H30zM33 18h2v1H33zM36 18h1v1H36zM5 19h1v1H5zM8 19h2v1H8zM11 19h1v1H11zM13 19h1v1H13zM18 19h3v1H18zM23 19h2v1H23zM28 19h2v1H28zM31 19h2v1H31zM35 19h1v1H35zM6 20h1v1H6zM9 20h2v1H9zM13 20h1v1H13zM15 20h3v1H15zM21 20h1v1H21zM24 20h1v1H24zM30 20h2v1H30zM36 20h1v1H36zM4 21h1v1H4zM7 21h3v1H7zM14 21h1v1H14zM16 21h2v1H16zM19 21h1v1H19zM21 21h1v1H21zM24 21h1v1H24zM27 21h3v1H27zM31 21h1v1H31zM33 21h1v1H33zM36 21h1v1H36zM8 22h1v1H8zM10 22h1v1H10zM13 22h1v1H13zM15 22h1v1H15zM17 22h1v1H17zM19 22h1v1H19zM23 22h1v1H23zM26 22h4v1H26zM32 22h3v1H32zM36 22h1v1H36zM6 23h1v1H6zM8 23h2v1H8zM14 23h2v1H14zM18 23h1v1H18zM20 23h2v1H20zM23 23h1v1H23zM26 23h1v1H26zM30 23h1v1H30zM36 23h1v1H36zM5 24h2v1H5zM8 24h1v1H8zM10 24h2v1H10zM13 24h2v1H13zM16 24h2v1H16zM19 24h1v1H19zM21 24h1v1H21zM25 24h1v1H25zM28 24h1v1H28zM30 24h1v1H30zM32 24h1v1H32zM35 24h1v1H35zM5 25h2v1H5zM8 25h1v1H8zM17 25h2v1H17zM25 25h1v1H25zM27 25h1v1H27zM31 25h1v1H31zM33 25h1v1H33zM35 25h1v1H35zM4 26h2v1H4zM9 26h2v1H9zM12 26h1v1H12zM14 26h1v1H14zM16 26h1v1H16zM18 26h2v1H18zM21 26h1v1H21zM23 26h1v1H23zM26 26h2v1H26zM30 26h1v1H30zM32 26h2v1H32zM36 26h1v1H36zM7 27h1v1H7zM11 27h1v1H11zM13 27h1v1H13zM15 27h2v1H15zM18 27h1v1H18zM28 27h6v1H28zM4 28h4v1H4zM10 28h2v1H10zM13 28h1v1H13zM17 28h3v1H17zM23 28h3v1H23zM28 28h5v1H28zM35 28h2v1H35zM12 29h3v1H12zM18 29h1v1H18zM20 29h1v1H20zM24 29h2v1H24zM28 29h1v1H28zM32 29h1v1H32zM35 29h2v1H35zM4 30h7v1H4zM12 30h1v1H12zM14 30h1v1H14zM16 30h2v1H16zM19 30h6v1H19zM28 30h1v1H28zM30 30h1v1H30zM32 30h1v1H32zM34 30h1v1H34zM36 30h1v1H36zM4 31h1v1H4zM10 31h1v1H10zM16 31h4v1H16zM22 31h1v1H22zM27 31h2v1H27zM32 31h2v1H32zM35 31h1v1H35zM4 32h1v1H4zM6 32h3v1H6zM10 32h1v1H10zM13 32h2v1H13zM16 32h1v1H16zM19 32h14v1H19zM35 32h1v1H35zM4 33h1v1H4zM6 33h3v1H6zM10 33h1v1H10zM15 33h1v1H15zM18 33h1v1H18zM20 33h1v1H20zM22 33h1v1H22zM24 33h2v1H24zM29 33h1v1H29zM31 33h1v1H31zM35 33h2v1H35zM4 34h1v1H4zM6 34h3v1H6zM10 34h1v1H10zM12 34h1v1H12zM15 34h3v1H15zM20 34h1v1H20zM22 34h1v1H22zM24 34h2v1H24zM27 34h1v1H27zM32 34h5v1H32zM4 35h1v1H4zM10 35h1v1H10zM13 35h1v1H13zM16 35h1v1H16zM19 35h2v1H19zM22 35h3v1H22zM30 35h2v1H30zM33 35h1v1H33zM4 36h7v1H4zM12 36h2v1H12zM15 36h1v1H15zM17 36h2v1H17zM21 36h1v1H21zM26 36h1v1H26zM28 36h2v1H28zM32 36h2v1H32zM36 36h1v1H36z';
 function t(key, values={}) {
-  let value = translations[language]?.[key] || translations.en[key] || key;
+  let value = translations[language]?.[key] || translations.en?.[key] || translations.ru?.[key] || key;
   Object.entries(values).forEach(([name, replacement]) => { value = value.replace(`{${name}}`, replacement); });
   return value;
 }
-function applyLanguage() {
-  document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = t(element.dataset.i18n); });
-  const button = document.getElementById('languageButton');
-  if (button) button.textContent = language === 'en' ? 'RU' : 'EN';
-}
-function toggleLanguage() {
-  language = language === 'en' ? 'ru' : 'en';
+function setLanguage(lang) {
+  language = normalizeLanguage(lang);
   localStorage.setItem('tvstreammersat5-language', language);
   applyLanguage();
   render(true);
   saveLanguagePreference();
+}
+function applyLanguage() {
+  document.querySelectorAll('[data-i18n]').forEach(element => { element.textContent = t(element.dataset.i18n); });
+  const btnEn = document.getElementById('langBtnEn');
+  const btnRu = document.getElementById('langBtnRu');
+  if (btnEn && btnRu) {
+    btnEn.classList.toggle('active', language === 'en');
+    btnRu.classList.toggle('active', language === 'ru');
+  }
+  const button = document.getElementById('languageButton');
+  if (button) button.textContent = language.toUpperCase();
+}
+function toggleLanguage() {
+  setLanguage(language === 'en' ? 'ru' : 'en');
 }
 function closeSystemMenu() {
   document.getElementById('systemMenu')?.removeAttribute('open');
@@ -4090,17 +4103,18 @@ function updateDvbMeter(tile, kind, value, available, locked) {
   label.textContent = `${kind === 'signal' ? 'S' : 'Q'} ${available ? `${shown}%` : '—'}`;
 }
 function caDecodeInfo(stream) {
-  if (!stream?.conditional_access_client) return {cls:'offline', text:'FTA', detail:'Не требуется'};
+  const isRu = language === 'ru';
+  if (!stream?.conditional_access_client) return {cls:'offline', text:'FTA', detail:isRu ? 'Не требуется' : 'Not required'};
   const mode = String(stream.ca_decode_state || (stream.active ? 'waiting' : 'offline'));
   const scrambled = Number(stream.ca_output_scrambled_packets || 0);
   const payload = Number(stream.ca_output_payload_packets || 0);
   const clearPes = Number(stream.ca_output_clear_pes_starts || 0);
   const percent = Number(stream.ca_output_scrambled_percent || 0);
-  if (mode === 'clear') return {cls:'clear', text:'ДЕКОД: ОК', detail:`ОТКРЫТ A/V · PES ${clearPes} · scrambled 0/${payload}`};
-  if (mode === 'scrambled') return {cls:'scrambled', text:'ДЕКОД: НЕТ', detail:`ЗАКОДИРОВАН A/V · ${percent.toFixed(1)}% (${scrambled}/${payload})`};
-  if (mode === 'invalid') return {cls:'scrambled', text:'ДЕКОД: НЕТ', detail:`A/V пакеты идут, но валидный открытый PES не найден (${payload} пак.)`};
-  if (mode === 'offline') return {cls:'offline', text:'ДЕКОД: OFF', detail:'Канал остановлен'};
-  return {cls:'waiting', text:'ДЕКОД: …', detail:'ОЖИДАНИЕ A/V ПАКЕТОВ'};
+  if (mode === 'clear') return {cls:'clear', text:isRu ? 'ДЕКОД: ОК' : 'DECODE: OK', detail:isRu ? `ОТКРЫТ A/V · PES ${clearPes} · scrambled 0/${payload}` : `CLEAR A/V · PES ${clearPes} · scrambled 0/${payload}`};
+  if (mode === 'scrambled') return {cls:'scrambled', text:isRu ? 'ДЕКОД: НЕТ' : 'DECODE: NO', detail:isRu ? `ЗАКОДИРОВАН A/V · ${percent.toFixed(1)}% (${scrambled}/${payload})` : `SCRAMBLED A/V · ${percent.toFixed(1)}% (${scrambled}/${payload})`};
+  if (mode === 'invalid') return {cls:'scrambled', text:isRu ? 'ДЕКОД: НЕТ' : 'DECODE: NO', detail:isRu ? `A/V пакеты идут, но валидный открытый PES не найден (${payload} пак.)` : `A/V packets present, but valid clear PES not found (${payload} pkts)`};
+  if (mode === 'offline') return {cls:'offline', text:isRu ? 'ДЕКОД: OFF' : 'DECODE: OFF', detail:isRu ? 'Канал остановлен' : 'Channel stopped'};
+  return {cls:'waiting', text:isRu ? 'ДЕКОД: …' : 'DECODE: …', detail:isRu ? 'ОЖИДАНИЕ A/V ПАКЕТОВ' : 'WAITING FOR A/V PACKETS'};
 }
 
 function updateStreamTile(tile, stream) {
@@ -4145,7 +4159,7 @@ function updateStreamTile(tile, stream) {
   if (decodePill) {
     decodePill.className = `decode-pill ${decodeInfo.cls}`;
     decodePill.textContent = decodeInfo.text;
-    decodePill.title = `${decodeInfo.detail}. Контроль по A/V PID, scrambling_control и валидному PES на выходе.`;
+    decodePill.title = `${decodeInfo.detail}. ${language === 'ru' ? 'Контроль по A/V PID, scrambling_control и валидному PES на выходе.' : 'Verified via A/V PID, scrambling_control, and valid PES output.'}`;
   }
 
   const toggleButton = tile.querySelector('[data-role="stream-toggle"]');
@@ -4192,7 +4206,7 @@ function render(force=false) {
     tile.className = 'tile' + (stream.active ? ' active' : '');
     tile.dataset.streamId = String(stream.id);
     tile.dataset.streamName = String(stream.name || stream.id);
-    tile.title = 'Двойной клик — предпросмотр';
+    tile.title = t('doubleClickPreview');
     tile.innerHTML = `
       <div class="top">
         <div>
@@ -4218,8 +4232,8 @@ function render(force=false) {
         <div class="info-row"><strong>${t('backup')}</strong><span>${stream.backup_input_uri || '—'}${stream.backup_input_type === 'file' && stream.backup_file_loop ? ' · loop' : ''}</span></div>
         <div class="info-row"><strong>${t('sid')}</strong><span>${stream.service_id || '—'}</span></div>
         ${stream.conditional_access_client ? `<div class="info-row"><strong>CA</strong><span data-role="ca-status">${caStreamStatusText(stream)}</span></div>
-        <div class="info-row decode-row"><strong>Декодирование</strong><span data-role="decode-status" class="decode-pill ${caDecodeInfo(stream).cls}" title="Контроль по A/V PID, scrambling_control и валидному PES">${caDecodeInfo(stream).text}</span></div>` : `<div class="info-row placeholder"><strong>CA</strong><span>—</span></div>
-        <div class="info-row placeholder decode-row"><strong>Декодирование</strong><span>—</span></div>`}
+        <div class="info-row decode-row"><strong>${t('decoding')}</strong><span data-role="decode-status" class="decode-pill ${caDecodeInfo(stream).cls}" title="${language === 'ru' ? 'Контроль по A/V PID, scrambling_control и валидному PES' : 'Verified via A/V PID, scrambling_control, and valid PES'}">${caDecodeInfo(stream).text}</span></div>` : `<div class="info-row placeholder"><strong>CA</strong><span>—</span></div>
+        <div class="info-row placeholder decode-row"><strong>${t('decoding')}</strong><span>—</span></div>`}
         <div class="info-row"><strong>${t('bitrateIn')}</strong><span data-role="bitrate-in">${stream.bitrate_in_kbps ? stream.bitrate_in_kbps + ' kbps' : '—'}</span></div>
         <div class="info-row"><strong>${t('bitrateOut')}</strong><span data-role="bitrate-out">${stream.bitrate_out_kbps ? stream.bitrate_out_kbps + ' kbps' : '—'}</span></div>
       </div>
@@ -4362,19 +4376,19 @@ function renderMptsList() {
     return `<div class="mpts-row">
       <div class="mpts-name" title="${escapeHtmlValue(output.name || output.id)}">${escapeHtmlValue(output.name || output.id)}</div>
       <div class="mpts-endpoint">${escapeHtmlValue(output.output_host || '')}:${Number(output.output_port || 0)}</div>
-      <div class="mpts-services">${ready}/${configured} сервисов</div>
-      <span class="mpts-state ${active?'on':'off'}">${active?'Работает':'Остановлен'}</span>
+      <div class="mpts-services">${ready}/${configured} ${t('mptsServicesSuffix')}</div>
+      <span class="mpts-state ${active?'on':'off'}">${active?t('running'):t('stopped')}</span>
       <div class="mpts-actions">
-        <button class="button-secondary" onclick="mptsActionByIndex(${index},'${active?'stop':'start'}')">${active?'Стоп':'Старт'}</button>
-        <button class="button-secondary" onclick="openMptsEditor(${index})">Ред.</button>
-        <button class="button-danger" onclick="deleteMptsOutput(${index})">Удалить</button>
+        <button class="button-secondary" onclick="mptsActionByIndex(${index},'${active?'stop':'start'}')">${active?t('stop'):t('start')}</button>
+        <button class="button-secondary" onclick="openMptsEditor(${index})">${t('edit')}</button>
+        <button class="button-danger" onclick="deleteMptsOutput(${index})">${t('delete')}</button>
       </div>
     </div>`;
-  }).join('') : `<div class="mpts-empty">MPTS-выходы ещё не созданы</div>`;
+  }).join('') : `<div class="mpts-empty">${t('mptsEmpty')}</div>`;
   openModal(`
     <h2>MPTS</h2>
-    <div class="mpts-hint">Отдельный пакетный мультиплексор объединяет выбранные выходные SPTS в один MPEG-TS. PCR/PTS/DTS медиапакетов не переписываются; исходные PAT/PMT/SDT заменяются общей таблицей MPTS, null-пакеты отдельных каналов отбрасываются.</div>
-    <div class="mpts-toolbar"><strong>MPTS-выходы</strong><button class="button-primary" onclick="openMptsEditor(-1)">+ Добавить MPTS</button></div>
+    <div class="mpts-hint">${t('mptsHint')}</div>
+    <div class="mpts-toolbar"><strong>${t('mptsOutputs')}</strong><button class="button-primary" onclick="openMptsEditor(-1)">${t('addMpts')}</button></div>
     <div class="mpts-list">${rows}</div>
     <div class="modal-actions"><button class="button-secondary" onclick="closeModal()">${t('close')}</button></div>
   `);
@@ -4404,38 +4418,38 @@ function openMptsEditor(index) {
     const id = String(stream.id || '');
     const checked = selected.has(id);
     const runtime = runtimeById.get(id);
-    const runtimeText = runtime ? (runtime.ready ? `готов · SID ${runtime.service_id} · PMT ${runtime.pmt_pid}` : 'ожидание PSI') : '';
+    const runtimeText = runtime ? (runtime.ready ? `${language === 'ru' ? 'готов' : 'ready'} · SID ${runtime.service_id} · PMT ${runtime.pmt_pid}` : (language === 'ru' ? 'ожидание PSI' : 'waiting for PSI')) : '';
     return `<label class="mpts-service-row">
       <input class="mpts-service-check" type="checkbox" data-stream-id="${escapeHtmlValue(id)}" ${checked?'checked':''}/>
       <span>${escapeHtmlValue(stream.name || id)}</span>
-      <input class="mpts-service-sid" data-stream-id="${escapeHtmlValue(id)}" type="number" min="0" max="65535" value="${checked ? selected.get(id) : 0}" title="SID MPTS, 0 = автоматически"/>
+      <input class="mpts-service-sid" data-stream-id="${escapeHtmlValue(id)}" type="number" min="0" max="65535" value="${checked ? selected.get(id) : 0}" title="${language === 'ru' ? 'SID MPTS, 0 = автоматически' : 'MPTS SID, 0 = automatic'}"/>
       <span class="mpts-runtime ${runtime?.ready?'ready':''}">${escapeHtmlValue(runtimeText)}</span>
     </label>`;
-  }).join('') || `<div class="mpts-empty">Сначала создайте каналы</div>`;
+  }).join('') || `<div class="mpts-empty">${language === 'ru' ? 'Сначала создайте каналы' : 'Configure streams first'}</div>`;
   openModal(`
-    <h2>${existing?'Редактирование MPTS':'Новый MPTS'}</h2>
+    <h2>${existing ? t('editMpts') : t('newMpts')}</h2>
     <input id="mptsEditId" type="hidden" value="${escapeHtmlValue(output.id)}" />
     <input id="mptsEditIndex" type="hidden" value="${index}" />
     <div class="form-grid">
-      <div class="form-row"><label>Имя</label><input id="mptsName" value="${escapeHtmlValue(output.name)}" /></div>
-      <div class="form-row"><label>IP назначения</label><input id="mptsHost" value="${escapeHtmlValue(output.output_host)}" placeholder="239.255.20.1" /></div>
-      <div class="form-row"><label>Порт</label><input id="mptsPort" type="number" min="1" max="65535" value="${output.output_port}" /></div>
-      <div class="form-row"><label>Интерфейс выхода</label><select id="mptsInterface">${interfaceOptions}</select></div>
-      <label class="checkbox-inline"><input id="mptsAutoStart" type="checkbox" ${output.auto_start?'checked':''}/><span>Автозапуск MPTS</span></label>
+      <div class="form-row"><label>${t('name')}</label><input id="mptsName" value="${escapeHtmlValue(output.name)}" /></div>
+      <div class="form-row"><label>${t('destIp')}</label><input id="mptsHost" value="${escapeHtmlValue(output.output_host)}" placeholder="239.255.20.1" /></div>
+      <div class="form-row"><label>${t('port')}</label><input id="mptsPort" type="number" min="1" max="65535" value="${output.output_port}" /></div>
+      <div class="form-row"><label>${t('outputInterfaceMpts')}</label><select id="mptsInterface">${interfaceOptions}</select></div>
+      <label class="checkbox-inline"><input id="mptsAutoStart" type="checkbox" ${output.auto_start?'checked':''}/><span>${t('mptsAutoStart')}</span></label>
     </div>
-    <h3>Каналы MPTS</h3>
-    <div class="mpts-hint">SID = 0 означает автоматическую нумерацию от базового SID. Порядок сервисов соответствует порядку каналов в конфигурации.</div>
+    <h3>${t('mptsChannels')}</h3>
+    <div class="mpts-hint">${t('mptsSidHint')}</div>
     <div class="mpts-service-picker">${serviceRows}</div>
-    <details class="mpts-advanced"><summary>Расширенные параметры PSI</summary>
+    <details class="mpts-advanced"><summary>${t('advancedPsi')}</summary>
       <div class="form-grid">
         <div class="form-row"><label>TSID</label><input id="mptsTsid" type="number" min="1" max="65535" value="${output.transport_stream_id}" /></div>
         <div class="form-row"><label>ONID</label><input id="mptsOnid" type="number" min="1" max="65535" value="${output.original_network_id}" /></div>
-        <div class="form-row"><label>Базовый SID</label><input id="mptsSidBase" type="number" min="1" max="65535" value="${output.service_id_base}" /></div>
-        <div class="form-row"><label>Базовый PMT PID</label><input id="mptsPmtBase" type="number" min="32" max="8190" value="${output.pmt_pid_base}" /></div>
+        <div class="form-row"><label>${t('baseSid')}</label><input id="mptsSidBase" type="number" min="1" max="65535" value="${output.service_id_base}" /></div>
+        <div class="form-row"><label>${t('basePmtPid')}</label><input id="mptsPmtBase" type="number" min="32" max="8190" value="${output.pmt_pid_base}" /></div>
       </div>
     </details>
     <div class="modal-actions">
-      <button class="button-secondary" onclick="renderMptsList()">Назад</button>
+      <button class="button-secondary" onclick="renderMptsList()">${t('back')}</button>
       <button class="button-primary" onclick="saveMptsEditor()">${t('save')}</button>
     </div>
   `);
@@ -4448,7 +4462,7 @@ async function saveMptsEditor() {
     const sid = Number(document.querySelector(`.mpts-service-sid[data-stream-id="${CSS.escape(id)}"]`)?.value || 0);
     return {stream_id:id, service_id:Number.isFinite(sid) ? Math.max(0, Math.min(65535, sid)) : 0};
   }).filter(service => service.stream_id);
-  if (!services.length) { uiError('Выберите хотя бы один канал для MPTS'); return; }
+  if (!services.length) { uiError(language === 'ru' ? 'Выберите хотя бы один канал для MPTS' : 'Select at least one channel for MPTS'); return; }
   const output = {
     id:String(document.getElementById('mptsEditId')?.value || `mpts-${Date.now()}`),
     name:String(document.getElementById('mptsName')?.value || 'MPTS').trim() || 'MPTS',
@@ -4463,7 +4477,7 @@ async function saveMptsEditor() {
     services
   };
   if (!output.output_host || output.output_port < 1 || output.output_port > 65535) {
-    uiError('Укажите корректный IP и порт MPTS'); return;
+    uiError(language === 'ru' ? 'Укажите корректный IP и порт MPTS' : 'Specify valid MPTS IP and port'); return;
   }
   const outputs = (mptsState.outputs || []).map(mptsConfigOnly);
   if (index >= 0 && index < outputs.length) outputs[index] = output; else outputs.push(output);
@@ -4471,7 +4485,7 @@ async function saveMptsEditor() {
     const result = await fetchJson('/api/mpts/save', {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({outputs})
     }, 15000);
-    if (result.result !== 'ok') throw new Error(result.error || 'Не удалось сохранить MPTS');
+    if (result.result !== 'ok') throw new Error(result.error || (language === 'ru' ? 'Не удалось сохранить MPTS' : 'Failed to save MPTS'));
     mptsState = result;
     renderMptsList();
   } catch (error) { uiError(error?.message || error); }
@@ -4479,13 +4493,13 @@ async function saveMptsEditor() {
 async function deleteMptsOutput(index) {
   const output = mptsState.outputs?.[index];
   if (!output) return;
-  if (!confirm(`Удалить MPTS «${output.name || output.id}»?`)) return;
+  if (!confirm(language === 'ru' ? `Удалить MPTS «${output.name || output.id}»?` : `Delete MPTS "${output.name || output.id}"?`)) return;
   const outputs = (mptsState.outputs || []).map(mptsConfigOnly).filter((_,i) => i !== index);
   try {
     const result = await fetchJson('/api/mpts/save', {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({outputs})
     }, 15000);
-    if (result.result !== 'ok') throw new Error(result.error || 'Не удалось удалить MPTS');
+    if (result.result !== 'ok') throw new Error(result.error || (language === 'ru' ? 'Не удалось удалить MPTS' : 'Failed to delete MPTS'));
     mptsState = result;
     renderMptsList();
   } catch (error) { uiError(error?.message || error); }
@@ -4887,8 +4901,8 @@ function openAboutModal() {
     <div class="about-list">
       <div class="about-row"><strong>${t('product')}</strong><span>TVStreammerSAT5</span></div>
       <div class="about-row"><strong>${t('version')}</strong><span>${state.program_version||'202.55'}</span></div>
-      <div class="about-row"><strong>${t('name')}</strong><span>Лукомский Виталий</span></div>
-      <div class="about-row"><strong>${t('country')}</strong><span>Беларусь, г. Борисов</span></div>
+      <div class="about-row"><strong>${t('name')}</strong><span>${language === 'ru' ? 'Лукомский Виталий' : 'Vitali Lukomski'}</span></div>
+      <div class="about-row"><strong>${t('country')}</strong><span>${language === 'ru' ? 'Беларусь, г. Борисов' : 'Belarus, Borisov'}</span></div>
       <div class="about-row"><strong>${t('contactEmail')}</strong><a href="mailto:monkipnet@gmail.com">monkipnet@gmail.com</a></div>
       <div class="about-row about-donate"><strong>${t('donate')}</strong><div class="about-donate-content">
         <svg class="about-qr" viewBox="0 0 41 41" role="img" aria-label="${t('donateQr')}" shape-rendering="crispEdges">
@@ -4911,10 +4925,10 @@ function openLoginModal() {
     <h2>${t('userTitle')}</h2>
     <div class="form-grid full">
       <div class="form-row"><label>Login</label><input id="login" value="${state.login||''}" /></div>
-      <div class="form-row"><label>Новый пароль</label><input id="password" type="password" placeholder="Оставьте пустым, чтобы не менять" /></div>
-      <div class="form-row"><label>Имя сервера</label><input id="serverName" value="${state.server_name||''}" /></div>
-      <div class="form-row"><label>Порт web-интерфейса</label><input id="httpPort" type="number" min="1" max="65535" value="${state.http_port||9000}" /></div>
-      <div class="form-row full"><label>SRT для VPS/VDS</label><div class="checkbox-inline"><input id="srtVpsVdsOptimization" type="checkbox" ${state.srt_vps_vds_optimization ? 'checked' : ''} /><span>Оптимизация SRT для VPS/VDS/контейнеров</span></div><small>203.67: включает для всех SRT-входов и выходов latency 1500 ms, rcvlatency/peerlatency 1500 ms, SRT RX/TX buffers 16 MiB, FC 32768 пакетов и poll-timeout 2000 ms. Использовать на VPS/VDS с виртуальной сетью; на обычном LAN/физическом сервере оставлять выключенным.</small></div>
+      <div class="form-row"><label>${t('newPassword')}</label><input id="password" type="password" placeholder="${t('newPasswordPlaceholder')}" /></div>
+      <div class="form-row"><label>${t('serverName')}</label><input id="serverName" value="${state.server_name||''}" /></div>
+      <div class="form-row"><label>${t('webPort')}</label><input id="httpPort" type="number" min="1" max="65535" value="${state.http_port||9000}" /></div>
+      <div class="form-row full"><label>${t('srtVpsLabel')}</label><div class="checkbox-inline"><input id="srtVpsVdsOptimization" type="checkbox" ${state.srt_vps_vds_optimization ? 'checked' : ''} /><span>${t('srtVpsOptimization')}</span></div><small>${t('srtVpsHelp')}</small></div>
     </div>
     <div class="modal-actions">
       <button class="button-secondary" onclick="closeModal()">${t('cancel')}</button>
@@ -4930,8 +4944,8 @@ function openTelegramModal() {
       <div class="form-row"><label>Chat ID</label><input id="telegramChatId" value="${state.telegram_chat_id||''}" /></div>
     </div>
     <div class="modal-actions">
-      <button class="button-secondary" onclick="closeModal()">Отмена</button>
-      <button class="button-primary" onclick="saveSettings()">Сохранить</button>
+      <button class="button-secondary" onclick="closeModal()">${t('cancel')}</button>
+      <button class="button-primary" onclick="saveSettings()">${t('save')}</button>
     </div>
   `);
 }
@@ -5141,7 +5155,7 @@ function refreshSatelliteFrontendOptions(preferredFrontend=null) {
     const device = String(item.device || `/dev/dvb/adapter${adapter}/frontend${f}`);
     const consumers = Number(item.consumers || 0);
     const freq = Number(item.frequency_khz || 0);
-    const tune = consumers > 0 ? ` · SHARED ${consumers}${freq ? ` · ${(freq/1000).toFixed(0)} MHz ${satEscape(String(item.polarity||''))}` : ''}` : ' · свободен';
+    const tune = consumers > 0 ? ` · SHARED ${consumers}${freq ? ` · ${(freq/1000).toFixed(0)} MHz ${satEscape(String(item.polarity||''))}` : ''}` : (language === 'ru' ? ' · свободен' : ' · free');
     return `<option value="${f}">Frontend ${f}${tune} · ${satEscape(device)}</option>`;
   }).join('');
   const selected = frontends.some(item => Number(item.frontend) === previous)
@@ -5164,7 +5178,7 @@ function refreshSatelliteAdapterOptions(preferredAdapter=null, preferredFrontend
     const adapterItems = dvbAdapters.filter(item => Number(item.adapter) === adapter);
     const count = adapterItems.length;
     const used = adapterItems.reduce((sum,item)=>sum + (Number(item.consumers||0)>0 ? 1 : 0), 0);
-    return `<option value="${adapter}">Adapter ${adapter}${count > 1 ? ` · ${count} frontend` : ''}${used ? ` · занято ${used}` : ''}</option>`;
+    return `<option value="${adapter}">Adapter ${adapter}${count > 1 ? ` · ${count} frontend` : ''}${used ? (language === 'ru' ? ` · занято ${used}` : ` · busy ${used}`) : ''}</option>`;
   }).join('');
   const selected = adapters.includes(previous) ? previous : adapters[0];
   adapterSelect.value = String(selected);
@@ -5223,7 +5237,7 @@ function resetSatelliteServicesForTuneChange() {
   const services = document.getElementById('satServices');
   const count = document.getElementById('satFoundCount');
   if (count) count.textContent = '0';
-  if (services) services.innerHTML = '<div class="sat-empty">Параметры тюнера изменены. Выполните сканирование заново.</div>';
+  if (services) services.innerHTML = `<div class="sat-empty">${language === 'ru' ? 'Параметры тюнера изменены. Выполните сканирование заново.' : 'Tuner parameters changed. Please scan again.'}</div>`;
 }
 function satelliteAdapterChanged() {
   ++satelliteTuneGeneration;
@@ -5235,7 +5249,7 @@ function satelliteAdapterChanged() {
   const adapter = Number(document.getElementById('satAdapter')?.value || 0);
   const frontend = Number(document.getElementById('satFrontend')?.value || 0);
   const info = document.getElementById('satDeviceInfo');
-  if (info) info.textContent = `Выбран /dev/dvb/adapter${adapter}/frontend${frontend}`;
+  if (info) info.textContent = `${language === 'ru' ? 'Выбран' : 'Selected'} /dev/dvb/adapter${adapter}/frontend${frontend}`;
   updateSatelliteSignal();
 }
 function satelliteFrontendChanged() {
@@ -5247,7 +5261,7 @@ function satelliteFrontendChanged() {
   const adapter = Number(document.getElementById('satAdapter')?.value || 0);
   const frontend = Number(document.getElementById('satFrontend')?.value || 0);
   const info = document.getElementById('satDeviceInfo');
-  if (info) info.textContent = `Выбран /dev/dvb/adapter${adapter}/frontend${frontend}`;
+  if (info) info.textContent = `${language === 'ru' ? 'Выбран' : 'Selected'} /dev/dvb/adapter${adapter}/frontend${frontend}`;
   updateSatelliteSignal();
 }
 async function updateSatelliteSignal() {
@@ -5276,7 +5290,7 @@ async function updateSatelliteSignal() {
   } catch (error) {
     if (error?.name === 'AbortError') return;
     const info = document.getElementById('satDeviceInfo');
-    if (info && generation === satelliteTuneGeneration) info.textContent = 'Ошибка чтения DVB frontend';
+    if (info && generation === satelliteTuneGeneration) info.textContent = language === 'ru' ? 'Ошибка чтения DVB frontend' : 'Error reading DVB frontend';
   } finally {
     if (controller === satelliteSignalController) {
       satelliteSignalController = null;
@@ -5300,12 +5314,12 @@ async function loadSatelliteAdapters() {
     dvbAdapters = Array.isArray(data.adapters) ? data.adapters : [];
     if (!data.dvbsrc_available) {
       refreshSatelliteAdapterOptions(adapterBeforeLoad, frontendBeforeLoad);
-      if (info) info.textContent = 'GStreamer dvbsrc не найден. Установите gstreamer1.0-plugins-bad.';
+      if (info) info.textContent = language === 'ru' ? 'GStreamer dvbsrc не найден. Установите gstreamer1.0-plugins-bad.' : 'GStreamer dvbsrc not found. Install gstreamer1.0-plugins-bad.';
       return;
     }
     if (!dvbAdapters.length) {
       refreshSatelliteAdapterOptions(adapterBeforeLoad, frontendBeforeLoad);
-      if (info) info.textContent = 'DVB frontend не обнаружен в /dev/dvb.';
+      if (info) info.textContent = language === 'ru' ? 'DVB frontend не обнаружен в /dev/dvb.' : 'No DVB frontend detected in /dev/dvb.';
       return;
     }
     const adapters = [...new Set(dvbAdapters.map(item => Number(item.adapter)).filter(Number.isFinite))];
@@ -5316,12 +5330,12 @@ async function loadSatelliteAdapters() {
       ? frontendBeforeLoad
       : Number((dvbAdapters.find(item => Number(item.adapter) === preferredAdapter) || dvbAdapters[0]).frontend || 0);
     refreshSatelliteAdapterOptions(preferredAdapter, preferredFrontend);
-    if (info) info.textContent = `Выбран /dev/dvb/adapter${preferredAdapter}/frontend${preferredFrontend} · доступно: ${dvbAdapters.map(item=>item.device).join(', ')}`;
+    if (info) info.textContent = `${language === 'ru' ? 'Выбран' : 'Selected'} /dev/dvb/adapter${preferredAdapter}/frontend${preferredFrontend} · ${language === 'ru' ? 'доступно' : 'available'}: ${dvbAdapters.map(item=>item.device).join(', ')}`;
     updateSatelliteSignal();
   } catch (error) {
     dvbAdapters = [];
     refreshSatelliteAdapterOptions();
-    if (info) info.textContent = 'Не удалось получить список DVB frontend';
+    if (info) info.textContent = language === 'ru' ? 'Не удалось получить список DVB frontend' : 'Failed to retrieve DVB frontend list';
   }
 }
 function renderSatelliteServices() {
@@ -5330,17 +5344,17 @@ function renderSatelliteServices() {
   if (count) count.textContent = String(satelliteServices.length);
   if (!container) return;
   if (!satelliteServices.length) {
-    container.innerHTML = '<div class="sat-empty">Каналы не найдены. Проверьте частоту, Symbol Rate, поляризацию и уровень сигнала.</div>';
+    container.innerHTML = `<div class="sat-empty">${t('noChannelsFound')}</div>`;
     return;
   }
   container.innerHTML = `
-    <div class="sat-service-head"><span><input id="satSelectAll" type="checkbox" checked onchange="toggleAllSatelliteServices(this.checked)" /></span><span>Канал</span><span>Провайдер</span><span>Доступ</span><span>SID</span><span>PMT PID</span></div>
+    <div class="sat-service-head"><span><input id="satSelectAll" type="checkbox" checked onchange="toggleAllSatelliteServices(this.checked)" /></span><span>${t('channel')}</span><span>${t('provider')}</span><span>${t('access')}</span><span>SID</span><span>PMT PID</span></div>
     ${satelliteServices.map((service,index)=>`
       <label class="sat-service-row">
         <input class="sat-service-check" type="checkbox" data-index="${index}" ${service.pmt_ready===false ? 'disabled' : 'checked'} />
         <span class="sat-service-name" title="${satEscape(service.name)}">${satEscape(service.name || ('Service ' + service.service_id))}</span>
         <span class="sat-service-provider" title="${satEscape(service.provider)}">${satEscape(service.provider || '—')}</span>
-        <span><span class="sat-access ${service.scrambled ? 'ca' : (service.pmt_ready===false ? 'unknown' : 'fta')}" title="${service.scrambled ? 'Кодированный канал (CA)' : (service.pmt_ready===false ? 'PMT/PID ещё не получены' : 'Открытый канал (FTA)')}">${service.scrambled ? 'КОД.' : (service.pmt_ready===false ? 'ПРОВ.' : 'FTA')}</span></span>
+        <span><span class="sat-access ${service.scrambled ? 'ca' : (service.pmt_ready===false ? 'unknown' : 'fta')}" title="${service.scrambled ? t('scrambledTitle') : (service.pmt_ready===false ? t('pmtPendingTitle') : t('ftaTitle'))}">${service.scrambled ? t('scrambledBadge') : (service.pmt_ready===false ? t('pmtPendingBadge') : 'FTA')}</span></span>
         <span>${Number(service.service_id || 0)}</span>
         <span title="PCR PID: ${Number(service.pcr_pid || 0)}; PIDs: ${(Array.isArray(service.stream_pids) ? service.stream_pids : []).join(', ')}">${Number(service.pmt_pid || 0)}</span>
       </label>`).join('')}`;
@@ -5362,7 +5376,7 @@ async function startSatelliteScan() {
   const payload = satelliteTunePayload();
   const holdLock = !!payload.hold_lock;
   if (button) button.disabled = true;
-  if (status) status.textContent = `Сканирование /dev/dvb/adapter${payload.adapter}/frontend${payload.frontend}${holdLock ? ' · удержание LOCK' : ''}...`;
+  if (status) status.textContent = `${t('scanningDevice')} /dev/dvb/adapter${payload.adapter}/frontend${payload.frontend}${holdLock ? (' · ' + t('holdLock')) : ''}...`;
   try {
     const response = await fetch('/api/dvb-scan', {
       method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(payload)
@@ -5385,12 +5399,12 @@ async function startSatelliteScan() {
       const scanDevice = satelliteLastScan?.device || `/dev/dvb/adapter${payload.adapter}/frontend${payload.frontend}`;
       status.textContent = data.error && !satelliteServices.length
         ? `${scanDevice}: ${data.error}`
-        : `${scanDevice} · Найдено: ${satelliteServices.length} · FTA: ${ftaCount} · Код.: ${caCount}${pendingCount ? ` · PMT: ${pendingCount} не готово` : ''}${data.error ? ` (${data.error})` : ''}`;
+        : `${scanDevice} · ${t('found')} ${satelliteServices.length} · FTA: ${ftaCount} · ${t('scrambledBadge')}: ${caCount}${pendingCount ? ` · PMT: ${pendingCount} ${language === 'ru' ? 'не готово' : 'pending'}` : ''}${data.error ? ` (${data.error})` : ''}`;
     }
   } catch (error) {
     satelliteServices = [];
     renderSatelliteServices();
-    if (status) status.textContent = 'Ошибка сканирования DVB-S/S2';
+    if (status) status.textContent = language === 'ru' ? 'Ошибка сканирования DVB-S/S2' : 'DVB-S/S2 scan error';
   } finally {
     satelliteScanning = false;
     if (button) button.disabled = false;
@@ -5412,7 +5426,7 @@ async function saveSelectedSatelliteChannels() {
     .map(input => satelliteServices[Number(input.dataset.index)])
     .filter(Boolean);
   if (!selected.length) {
-    alert('Выберите хотя бы один канал.');
+    alert(t('selectAtLeastOne'));
     return;
   }
   const saveButton = document.getElementById('satSaveButton');
@@ -5436,57 +5450,57 @@ async function saveSelectedSatelliteChannels() {
     closeModal();
     fetchState();
   } catch (error) {
-    alert(error.message || 'Не удалось сохранить спутниковые каналы');
+    alert(error.message || t('saveChannelsFailed'));
     if (saveButton) saveButton.disabled = false;
   }
 }
 function openAddChannelModal() {
   satelliteServices = [];
   openModal(`
-    <h2>Добавить канал — DVB-S/S2</h2>
+    <h2>${t('addChannelDvbTitle')}</h2>
     <div class="sat-signal-panel">
-      <div class="sat-meter"><div class="sat-meter-head"><span>Сигнал</span><strong id="satSignalValue">0%</strong></div><div class="sat-bar"><span id="satSignalBar"></span></div></div>
-      <div class="sat-meter"><div class="sat-meter-head"><span>Качество</span><strong id="satQualityValue">0%</strong></div><div class="sat-bar"><span id="satQualityBar"></span></div></div>
+      <div class="sat-meter"><div class="sat-meter-head"><span>${t('signal')}</span><strong id="satSignalValue">0%</strong></div><div class="sat-bar"><span id="satSignalBar"></span></div></div>
+      <div class="sat-meter"><div class="sat-meter-head"><span>${t('quality')}</span><strong id="satQualityValue">0%</strong></div><div class="sat-bar"><span id="satQualityBar"></span></div></div>
       <span id="satLock" class="sat-lock">NO LOCK</span>
     </div>
     <div class="sat-form">
-      <div class="sat-field"><label>Adapter</label><select id="satAdapter" onchange="satelliteAdapterChanged()"><option value="0">Adapter 0</option></select></div>
-      <div class="sat-field"><label>Frontend</label><select id="satFrontend" onchange="satelliteFrontendChanged()"><option value="0">Frontend 0</option></select></div>
-      <div class="sat-field"><label>Частота, MHz</label><input id="satFrequency" type="number" min="900" max="14000" step="0.001" value="11727" onchange="updateSatelliteSignal()" /></div>
-      <div class="sat-field"><label>Symbol Rate, kSym/s</label><input id="satSymbolRate" type="number" min="100" max="60000" step="1" value="27500" onchange="updateSatelliteSignal()" /></div>
-      <div class="sat-field"><label>Поляризация</label><select id="satPolarity" onchange="updateSatelliteSignal()"><option value="H">H — Horizontal</option><option value="V">V — Vertical</option></select></div>
-      <div class="sat-field"><label>Стандарт</label><select id="satDeliverySystem" onchange="updateSatelliteSignal()"><option value="dvb-s2">DVB-S2</option><option value="dvb-s">DVB-S</option></select></div>
-      <div class="sat-field"><label>Модуляция</label><select id="satModulation" onchange="updateSatelliteSignal()"><option value="auto">Auto</option><option value="qpsk">QPSK</option><option value="8psk">8PSK</option><option value="16apsk">16APSK</option><option value="32apsk">32APSK</option></select></div>
-      <div class="sat-field"><label>FEC</label><select id="satFec" onchange="updateSatelliteSignal()"><option value="auto">Auto</option><option>1/2</option><option>2/3</option><option>3/4</option><option>4/5</option><option>5/6</option><option>7/8</option><option>8/9</option><option>9/10</option><option>3/5</option></select></div>
-      <div class="sat-field"><label>DiSEqC source</label><input id="satDiseqc" type="number" min="-1" max="7" value="-1" onchange="updateSatelliteSignal()" /></div>
+      <div class="sat-field"><label>${t('adapter')}</label><select id="satAdapter" onchange="satelliteAdapterChanged()"><option value="0">Adapter 0</option></select></div>
+      <div class="sat-field"><label>${t('frontend')}</label><select id="satFrontend" onchange="satelliteFrontendChanged()"><option value="0">Frontend 0</option></select></div>
+      <div class="sat-field"><label>${t('frequency')}</label><input id="satFrequency" type="number" min="900" max="14000" step="0.001" value="11727" onchange="updateSatelliteSignal()" /></div>
+      <div class="sat-field"><label>${t('symbolRate')}</label><input id="satSymbolRate" type="number" min="100" max="60000" step="1" value="27500" onchange="updateSatelliteSignal()" /></div>
+      <div class="sat-field"><label>${t('polarity')}</label><select id="satPolarity" onchange="updateSatelliteSignal()"><option value="H">${t('polarityH')}</option><option value="V">${t('polarityV')}</option></select></div>
+      <div class="sat-field"><label>${t('standard')}</label><select id="satDeliverySystem" onchange="updateSatelliteSignal()"><option value="dvb-s2">DVB-S2</option><option value="dvb-s">DVB-S</option></select></div>
+      <div class="sat-field"><label>${t('modulation')}</label><select id="satModulation" onchange="updateSatelliteSignal()"><option value="auto">Auto</option><option value="qpsk">QPSK</option><option value="8psk">8PSK</option><option value="16apsk">16APSK</option><option value="32apsk">32APSK</option></select></div>
+      <div class="sat-field"><label>${t('fec')}</label><select id="satFec" onchange="updateSatelliteSignal()"><option value="auto">Auto</option><option>1/2</option><option>2/3</option><option>3/4</option><option>4/5</option><option>5/6</option><option>7/8</option><option>8/9</option><option>9/10</option><option>3/5</option></select></div>
+      <div class="sat-field"><label>${t('diseqcSource')}</label><input id="satDiseqc" type="number" min="-1" max="7" value="-1" onchange="updateSatelliteSignal()" /></div>
       <div class="sat-field"><label>LNB LOF1, MHz</label><input id="satLof1" type="number" value="9750" onchange="updateSatelliteSignal()" /></div>
       <div class="sat-field"><label>LNB LOF2, MHz</label><input id="satLof2" type="number" value="10600" onchange="updateSatelliteSignal()" /></div>
       <div class="sat-field"><label>LNB SLOF, MHz</label><input id="satSlof" type="number" value="11700" onchange="updateSatelliteSignal()" /></div>
-      <div class="sat-field"><label>ISI / Stream ID</label><input id="satStreamId" type="number" min="-1" max="255" value="-1" onchange="updateSatelliteSignal()" /></div>
-      <div class="sat-field wide"><label>Сканирование</label><div class="checkbox-inline"><input id="satHoldLock" type="checkbox" checked /><span>Удерживать LOCK</span></div></div>
+      <div class="sat-field"><label>${t('streamId')}</label><input id="satStreamId" type="number" min="-1" max="255" value="-1" onchange="updateSatelliteSignal()" /></div>
+      <div class="sat-field wide"><label>${t('scanning')}</label><div class="checkbox-inline"><input id="satHoldLock" type="checkbox" checked /><span>${t('holdLock')}</span></div></div>
     </div>
-    <div id="satDeviceInfo" class="sat-scan-status" style="margin-top:8px">Поиск DVB frontend...</div>
+    <div id="satDeviceInfo" class="sat-scan-status" style="margin-top:8px">${t('searchingDvb')}</div>
     <div class="cam-panel">
-      <div class="cam-head"><strong>CAM clients / Newcamd</strong><button id="satCamRefresh" class="button-secondary" type="button" onclick="refreshCamClients()">Refresh</button></div>
-      <div id="satCamClients" class="cam-list"><div class="cam-empty">Loading CAM clients...</div></div>
-      <div class="cam-select"><div class="sat-field"><label>CAM for scrambled channels</label><select id="satCamClientSelect"><option value="">Do not use CAM / FTA</option></select></div><small>Select the CAM client used to descramble saved encrypted services. Configure Newcamd/OSCam in System / Newcamd.</small></div>
+      <div class="cam-head"><strong>${t('camClientsTitle')}</strong><button id="satCamRefresh" class="button-secondary" type="button" onclick="refreshCamClients()">${t('refresh')}</button></div>
+      <div id="satCamClients" class="cam-list"><div class="cam-empty">${t('loadingCamClients')}</div></div>
+      <div class="cam-select"><div class="sat-field"><label>${t('camForScrambled')}</label><select id="satCamClientSelect"><option value="">${t('doNotUseCam')}</option></select></div><small>${t('camHelpText')}</small></div>
     </div>
     <div class="sat-actions">
-      <button id="satScanButton" class="button-primary" onclick="startSatelliteScan()">Сканировать каналы</button>
-      <span id="satScanStatus" class="sat-scan-status">Найдено: <span id="satFoundCount">0</span></span>
+      <button id="satScanButton" class="button-primary" onclick="startSatelliteScan()">${t('scanChannels')}</button>
+      <span id="satScanStatus" class="sat-scan-status">${t('found')} <span id="satFoundCount">0</span></span>
     </div>
-    <div id="satServices" class="sat-services"><div class="sat-empty">Нажмите «Сканировать каналы».</div></div>
+    <div id="satServices" class="sat-services"><div class="sat-empty">${t('clickScanChannels')}</div></div>
     <div class="sat-output">
-      <div class="sat-field"><label>Выход</label><select id="satOutputType"><option value="udp-vbr">UDP VBR</option><option value="udp-cbr">UDP CBR</option></select></div>
-      <div class="sat-field"><label>Multicast / IP</label><input id="satOutputHost" value="239.255.10.1" /></div>
-      <div class="sat-field"><label>Первый UDP порт</label><input id="satBasePort" type="number" min="1" max="65535" value="5000" /></div>
-      <div class="sat-field"><label>CBR bitrate, кбит/с</label><input id="satTargetBitrate" type="number" min="500" max="100000" value="12000" /></div>
-      <div class="sat-field"><label>Выходной интерфейс</label><select id="satOutputInterface"><option value="">Авто (системный маршрут)</option>${(state.interfaces||[]).map(i=>`<option value="${satEscape(i.address)}">${satEscape(i.name)} (${satEscape(i.address)})</option>`).join('')}</select></div>
-      <div class="sat-field wide"><label>Автозапуск</label><div class="checkbox-inline"><input id="satAutoStart" type="checkbox" /><span>Запускать созданные каналы после перезапуска</span></div></div>
+      <div class="sat-field"><label>${t('output')}</label><select id="satOutputType"><option value="udp-vbr">UDP VBR</option><option value="udp-cbr">UDP CBR</option></select></div>
+      <div class="sat-field"><label>${t('multicastIp')}</label><input id="satOutputHost" value="239.255.10.1" /></div>
+      <div class="sat-field"><label>${t('firstUdpPort')}</label><input id="satBasePort" type="number" min="1" max="65535" value="5000" /></div>
+      <div class="sat-field"><label>${t('cbrBitrateKbps')}</label><input id="satTargetBitrate" type="number" min="500" max="100000" value="12000" /></div>
+      <div class="sat-field"><label>${t('outputInterface')}</label><select id="satOutputInterface"><option value="">${t('autoSystemRoute')}</option>${(state.interfaces||[]).map(i=>`<option value="${satEscape(i.address)}">${satEscape(i.name)} (${satEscape(i.address)})</option>`).join('')}</select></div>
+      <div class="sat-field wide"><label>${t('autoStart')}</label><div class="checkbox-inline"><input id="satAutoStart" type="checkbox" /><span>${t('startAfterRestart')}</span></div></div>
     </div>
     <div class="modal-actions">
-      <button class="button-secondary" onclick="closeModal()">Отмена</button>
-      <button id="satSaveButton" class="button-primary" onclick="saveSelectedSatelliteChannels()">Сохранить выбранные</button>
+      <button class="button-secondary" onclick="closeModal()">${t('cancel')}</button>
+      <button id="satSaveButton" class="button-primary" onclick="saveSelectedSatelliteChannels()">${t('saveSelected')}</button>
     </div>
   `);
   document.getElementById('modalContent').classList.add('satellite-modal');
@@ -5518,7 +5532,7 @@ function outputTypeOptions(selected) {
   ];
   return options.map(([value, label]) => `<option value="${value}" ${selected===value?'selected':''}>${label}</option>`).join('');
 }
-function outputInterfaceOptions(selected, inheritLabel='Как основной') {
+function outputInterfaceOptions(selected, inheritLabel=(language==='ru'?'Как основной':'Same as primary')) {
   const selectedValue = String(selected || '');
   const options = [`<option value="" ${selectedValue ? '' : 'selected'}>${inheritLabel}</option>`];
   (state.interfaces || []).forEach(iface => {
@@ -5537,13 +5551,13 @@ function renderOutputRows(outputs, links=[], startIndex=0) {
     const interfaceAddress = String(output.interface_address || '');
     return `
       <div class="output-row" data-output-index="${index}">
-        <div class="form-row"><label>${index === 0 ? 'Основной формат' : 'Доп. формат'}</label><select data-output-field="output_type" onchange="updateOutputHints()">${outputTypeOptions(type)}</select></div>
-        <div class="form-row"><label>SRT режим</label><select data-output-field="output_mode" onchange="updateOutputHints()"><option value="listener" ${(!output.output_mode || output.output_mode==='listener')?'selected':''}>Listener</option><option value="caller" ${output.output_mode==='caller'?'selected':''}>Caller</option></select></div>
-        <div class="form-row"><label data-output-host-label>Адрес выхода</label><input data-output-field="output_host" value="${output.output_host||'239.0.0.1'}" placeholder="239.0.0.1" /></div>
-        <div class="form-row"><label data-output-port-label>Порт</label><input data-output-field="output_port" type="number" min="1" max="65535" value="${output.output_port||1234}" placeholder="1234" /></div>
-        <div class="form-row"><label>Интерфейс</label><select data-output-field="interface_address" onchange="outputInterfaceChanged(this)" ${index === 0 ? 'disabled' : ''}>${outputInterfaceOptions(interfaceAddress, index === 0 ? 'Основной интерфейс' : 'Как основной')}</select></div>
+        <div class="form-row"><label>${index === 0 ? t('primaryFormat') : t('additionalFormat')}</label><select data-output-field="output_type" onchange="updateOutputHints()">${outputTypeOptions(type)}</select></div>
+        <div class="form-row"><label>${t('srtMode')}</label><select data-output-field="output_mode" onchange="updateOutputHints()"><option value="listener" ${(!output.output_mode || output.output_mode==='listener')?'selected':''}>Listener</option><option value="caller" ${output.output_mode==='caller'?'selected':''}>Caller</option></select></div>
+        <div class="form-row"><label data-output-host-label>${t('outputAddress')}</label><input data-output-field="output_host" value="${output.output_host||'239.0.0.1'}" placeholder="239.0.0.1" /></div>
+        <div class="form-row"><label data-output-port-label>${t('port')}</label><input data-output-field="output_port" type="number" min="1" max="65535" value="${output.output_port||1234}" placeholder="1234" /></div>
+        <div class="form-row"><label>${t('interface')}</label><select data-output-field="interface_address" onchange="outputInterfaceChanged(this)" ${index === 0 ? 'disabled' : ''}>${outputInterfaceOptions(interfaceAddress, index === 0 ? t('primaryInterface') : t('inheritInterface'))}</select></div>
         <button class="remove-output" type="button" onclick="removeStreamOutput(this)" ${index === 0 ? 'disabled' : ''}>×</button>
-        <div class="form-row full" style="grid-column:1/-1"><label>URL для плеера</label><input readonly value="${link}" placeholder="Ссылка появится после сохранения" /></div>
+        <div class="form-row full" style="grid-column:1/-1"><label>${t('urlForPlayer')}</label><input readonly value="${link}" placeholder="${t('linkAfterSave')}" /></div>
       </div>
     `;
   }).join('');
@@ -5552,7 +5566,7 @@ function renumberOutputRows() {
   document.querySelectorAll('.output-row').forEach((row, index) => {
     row.dataset.outputIndex = index;
     const label = row.querySelector('label');
-    if (label) label.textContent = index === 0 ? 'Основной формат' : 'Доп. формат';
+    if (label) label.textContent = index === 0 ? t('primaryFormat') : t('additionalFormat');
     const remove = row.querySelector('.remove-output');
     if (remove) remove.disabled = index === 0;
   });
@@ -5601,7 +5615,7 @@ function selectUploadedBackupFile(path, name) {
   const status = document.getElementById('streamBackupUploadStatus');
   if (typeSelect) typeSelect.value = 'file';
   if (backupInput) backupInput.value = path || '';
-  if (status) status.textContent = name ? `Выбран файл: ${name}` : '';
+  if (status) status.textContent = name ? `${language === 'ru' ? 'Выбран файл' : 'Selected file'}: ${name}` : '';
   document.getElementById('streamBackupLibrary')?.classList.remove('open');
   updateBackupInputMode();
 }
@@ -5612,7 +5626,7 @@ function loadUploadedBackupFiles() {
   menu.textContent = '';
   const loading = document.createElement('div');
   loading.className = 'backup-library-empty';
-  loading.textContent = 'Загрузка списка...';
+  loading.textContent = language === 'ru' ? 'Загрузка списка...' : 'Loading files...';
   menu.appendChild(loading);
   fetch('/api/backup-files').then(r=>r.json()).then(result=>{
     menu.textContent = '';
@@ -5620,9 +5634,9 @@ function loadUploadedBackupFiles() {
     if (!files.length) {
       const empty = document.createElement('div');
       empty.className = 'backup-library-empty';
-      empty.textContent = result.error || 'Загруженных файлов нет';
+      empty.textContent = result.error || (language === 'ru' ? 'Загруженных файлов нет' : 'No uploaded files');
       menu.appendChild(empty);
-      if (button) button.textContent = 'Выбрать ранее загруженный файл';
+      if (button) button.textContent = t('selectUploadedFile');
       return;
     }
     files.forEach(file=>{
@@ -5638,7 +5652,7 @@ function loadUploadedBackupFiles() {
       remove.type = 'button';
       remove.className = 'backup-library-delete';
       remove.textContent = '×';
-      remove.title = `Удалить ${file.name}`;
+      remove.title = `${language === 'ru' ? 'Удалить' : 'Delete'} ${file.name}`;
       remove.onclick = event=>{event.stopPropagation(); deleteUploadedBackupFile(file);};
       row.append(select, remove);
       menu.appendChild(row);
@@ -5647,26 +5661,26 @@ function loadUploadedBackupFiles() {
     menu.textContent = '';
     const error = document.createElement('div');
     error.className = 'backup-library-empty';
-    error.textContent = 'Не удалось загрузить список файлов';
+    error.textContent = language === 'ru' ? 'Не удалось загрузить список файлов' : 'Failed to load file list';
     menu.appendChild(error);
   });
 }
 function deleteUploadedBackupFile(file) {
-  if (!file?.name || !confirm(`Удалить файл «${file.name}»?`)) return;
+  if (!file?.name || !confirm(language === 'ru' ? `Удалить файл «${file.name}»?` : `Delete file "${file.name}"?`)) return;
   fetch('/api/delete-backup-file', {
     method:'POST',
     headers:{'Content-Type':'application/json'},
     body:JSON.stringify({name:file.name})
   }).then(r=>r.json()).then(result=>{
-    if (result.result !== 'ok') throw new Error(result.error || 'Не удалось удалить файл');
+    if (result.result !== 'ok') throw new Error(result.error || (language === 'ru' ? 'Не удалось удалить файл' : 'Failed to delete file'));
     const backupInput = document.getElementById('streamBackupInput');
     const status = document.getElementById('streamBackupUploadStatus');
     if (backupInput && (backupInput.value === file.path || backupInput.value.endsWith('/' + file.name) || backupInput.value.endsWith('\\\\' + file.name))) {
       backupInput.value = '';
-      if (status) status.textContent = 'Выбранный файл удалён';
+      if (status) status.textContent = language === 'ru' ? 'Выбранный файл удалён' : 'Selected file deleted';
     }
     loadUploadedBackupFiles();
-  }).catch(error=>alert(error.message || 'Ошибка удаления файла'));
+  }).catch(error=>alert(error.message || (language === 'ru' ? 'Ошибка удаления файла' : 'File deletion error')));
 }
 function updateBackupInputMode() {
   const type = document.getElementById('streamBackupInputType')?.value || 'url';
@@ -5676,7 +5690,7 @@ function updateBackupInputMode() {
   const loopRow = document.getElementById('streamBackupFileLoopRow');
   if (pathInput) {
     pathInput.placeholder = type === 'file'
-      ? '/path/to/replacement.ts или загрузите файл ниже'
+      ? t('replacementPlaceholder')
       : 'http://192.168.1.2/...';
   }
   if (fileRow) fileRow.style.display = type === 'file' ? '' : 'none';
@@ -5691,7 +5705,7 @@ function uploadBackupReplacementFile(streamId, input) {
   if (!file || !backupInput) return;
   if (typeSelect) typeSelect.value = 'file';
   updateBackupInputMode();
-  if (status) status.textContent = 'Загрузка...';
+  if (status) status.textContent = language === 'ru' ? 'Загрузка...' : 'Uploading...';
   fetch(`/api/upload-backup-file?stream_id=${encodeURIComponent(streamId)}&filename=${encodeURIComponent(file.name)}`, {
     method:'POST',
     headers:{'Content-Type':'application/octet-stream'},
@@ -5699,13 +5713,13 @@ function uploadBackupReplacementFile(streamId, input) {
   }).then(r=>r.json()).then(result=>{
     if (result.path) {
       backupInput.value = result.path;
-      if (status) status.textContent = `Файл загружен: ${result.filename || file.name}`;
+      if (status) status.textContent = `${language === 'ru' ? 'Файл загружен' : 'File uploaded'}: ${result.filename || file.name}`;
       loadUploadedBackupFiles();
     } else {
-      if (status) status.textContent = result.error || 'Не удалось загрузить файл';
+      if (status) status.textContent = result.error || (language === 'ru' ? 'Не удалось загрузить файл' : 'File upload failed');
     }
   }).catch(()=>{
-    if (status) status.textContent = 'Ошибка загрузки файла';
+    if (status) status.textContent = language === 'ru' ? 'Ошибка загрузки файла' : 'File upload error';
   });
 }
 function updateHlsSynchronizationVisibility() {
@@ -5734,36 +5748,40 @@ function openStreamForm(stream) {
     const transcoderMissing = Array.isArray(transcoderInfo.missing_elements) ? transcoderInfo.missing_elements.join(', ') : '';
     const camOptions = camClientOptions(stream.conditional_access_client || '');
     const transcoderStatus = transcoderAvailable
-      ? `Доступно: H.264 Auto=${transcoderInfo.video_encoder || 'нет'}, NVENC ${transcoderInfo.nvenc_available ? 'да' : 'нет'}, Intel ${transcoderInfo.intel_available ? (transcoderInfo.intel_encoder || 'да') : 'нет'}, x264 ${transcoderInfo.x264_available ? 'да' : 'нет'}, AAC ${transcoderInfo.aac_encoder || 'нет'}, MP3 ${transcoderInfo.mp3_encoder || 'нет'}, deinterlace ${transcoderInfo.deinterlace ? 'да' : 'нет'}`
-      : `Недоступно: ${transcoderMissing || transcoderInfo.message || 'не установлены необходимые GStreamer-плагины'}`;
+      ? (language === 'ru'
+          ? `Доступно: H.264 Auto=${transcoderInfo.video_encoder || 'нет'}, NVENC ${transcoderInfo.nvenc_available ? 'да' : 'нет'}, Intel ${transcoderInfo.intel_available ? (transcoderInfo.intel_encoder || 'да') : 'нет'}, x264 ${transcoderInfo.x264_available ? 'да' : 'нет'}, AAC ${transcoderInfo.aac_encoder || 'нет'}, MP3 ${transcoderInfo.mp3_encoder || 'нет'}, deinterlace ${transcoderInfo.deinterlace ? 'да' : 'нет'}`
+          : `Available: H.264 Auto=${transcoderInfo.video_encoder || 'none'}, NVENC ${transcoderInfo.nvenc_available ? 'yes' : 'no'}, Intel ${transcoderInfo.intel_available ? (transcoderInfo.intel_encoder || 'yes') : 'no'}, x264 ${transcoderInfo.x264_available ? 'yes' : 'no'}, AAC ${transcoderInfo.aac_encoder || 'none'}, MP3 ${transcoderInfo.mp3_encoder || 'none'}, deinterlace ${transcoderInfo.deinterlace ? 'yes' : 'no'}`)
+      : (language === 'ru'
+          ? `Недоступно: ${transcoderMissing || transcoderInfo.message || 'не установлены необходимые GStreamer-плагины'}`
+          : `Unavailable: ${transcoderMissing || transcoderInfo.message || 'required GStreamer plugins not installed'}`);
     openModal(`
-      <h2>${stream.name ? 'Редактирование трансляции' : 'Настройка трансляции'}</h2>
+      <h2>${stream.name ? t('editStreamTitle') : t('addStreamTitle')}</h2>
       <div class="form-grid">
-        <div class="form-row full"><label>Имя плитки</label><input class="compact" id="streamName" value="${stream.name||''}" placeholder="Belarus 5" /></div>
-        <div class="form-row full"><div class="input-main-row"><div class="form-row"><label>Входной URL (Основной)</label><input id="streamInput" value="${stream.input_uri||''}" placeholder="rtsp://camera/live, udp://@:9087, udp://239.1.1.1:1234 или https://host/live.m3u8" /></div><div class="form-row"><label>Интерфейс входа</label><select id="streamInputInterface"><option value="">Auto / все интерфейсы</option>${inputOptions}</select></div><div class="form-row"><label>Режим входа</label><select id="streamInputMode" onchange="updateHlsSynchronizationVisibility()"><option value="auto" ${(!stream.input_mode || stream.input_mode==='auto')?'selected':''}>Auto</option><option value="hls" ${stream.input_mode==='hls'?'selected':''}>HLS</option><option value="http-ts" ${stream.input_mode==='http-ts'?'selected':''}>HTTP MPEG-TS</option><option value="caller" ${stream.input_mode==='caller'?'selected':''}>SRT Caller</option><option value="listener" ${stream.input_mode==='listener'?'selected':''}>SRT Listener</option></select></div></div></div>
-        <div class="form-row full"><label>HTTP / HLS доступ</label><div class="row-inline compact-row"><select id="streamHlsAccessKeyMode"><option value="none" ${(!stream.hls_access_key_mode||stream.hls_access_key_mode==='none')?'selected':''}>Без ключа</option><option value="header" ${stream.hls_access_key_mode==='header'?'selected':''}>HTTP Header</option><option value="query" ${stream.hls_access_key_mode==='query'?'selected':''}>Query parameter</option></select><input id="streamHlsAccessKeyName" value="${stream.hls_access_key_name||'Authorization'}" placeholder="Authorization или token" /><input id="streamHlsAccessKeyValue" value="${stream.hls_access_key_value||''}" autocomplete="off" placeholder="Bearer TOKEN / значение ключа" /></div><div class="row-inline compact-row" style="margin-top:8px"><input id="streamHlsUserAgent" value="${stream.hls_user_agent||'Mozilla/5.0 TVStreammerSAT5'}" placeholder="User-Agent" /></div><small>Ключ индивидуален для этого канала. Auto: URL *.m3u8 открывается как HLS, остальные HTTP/HTTPS URL — как single-request MPEG-TS. Для HLS без .m3u8 выбери режим HLS вручную. Для HTTP MPEG-TS ключ применяется к единственному запросу; для HLS — к manifest, variant playlist, сегментам и EXT-X-KEY. Если ключ уже находится в URL, оставь «Без ключа». Для Authorization указывай полное значение, например Bearer xxxxx.</small></div>
-        <div class="form-row full" id="streamHlsSynchronizationRow" style="display:${stream.input_mode==='hls'?'':'none'}"><label>HLS синхронизация</label><div class="checkbox-inline"><input id="streamHlsSlowPcrAssist" type="checkbox" ${stream.hls_slow_pcr_assist ? 'checked' : ''} onchange="if(this.checked){const x=document.getElementById('streamHlsPcrPhasePacing');if(x)x.checked=false;}" /><span>Provider PCR clock (ручной режим)</span></div><small>Для каналов вроде TV3: после стабилизации provider PCR становится фиксированным media clock. Транспортный PCR остаётся синтетическим 20 ms.</small><div class="checkbox-inline" style="margin-top:8px"><input id="streamHlsPcrPhasePacing" type="checkbox" ${stream.hls_pcr_phase_pacing ? 'checked' : ''} onchange="if(this.checked){const x=document.getElementById('streamHlsSlowPcrAssist');if(x)x.checked=false;}" /><span>Provider PCR deadline shaper (ручной режим)</span></div><small>203.41: для HLS с сильными VBR burst между provider PCR. Шейпер держит ограниченный lookahead 750 ms, заранее видит будущие PCR deadlines и распределяет burst по предыдущим свободным CBR-слотам, не превышая полезный потолок выхода. В output-path нет ожидания PCR, нет feedback PLL и catch-up. Внешний UDP остаётся CBR с synthetic PCR 20 ms и NULL stuffing. Не включать вместе с Provider PCR clock.</small></div>
-        <div class="form-row full" id="streamCamRow" style="display:${String(stream.input_uri||'').startsWith('dvb://')?'': 'none'}"><label>CAM client (scrambled DVB)</label><select id="streamConditionalAccessClient">${camOptions}</select><small>Select a CAM/Newcamd client for encrypted DVB services. FTA streams do not use this setting.</small></div>
-        <div class="form-row full"><label>Резерв / файл замены</label><div class="backup-source"><select id="streamBackupInputType" onchange="updateBackupInputMode()"><option value="url" ${(!stream.backup_input_type || stream.backup_input_type==='url')?'selected':''}>URL резерва</option><option value="file" ${stream.backup_input_type==='file'?'selected':''}>Файл замены</option></select><input id="streamBackupInput" value="${stream.backup_input_uri||''}" placeholder="http://192.168.1.2/..." /><div class="backup-library" id="streamBackupLibrary"><button class="backup-library-button" id="streamBackupLibraryButton" type="button" onclick="toggleBackupFileLibrary()">Выбрать ранее загруженный файл</button><div class="backup-library-menu" id="streamBackupLibraryMenu"></div></div><div class="backup-file-row" id="streamBackupFileRow"><input id="streamBackupFilePicker" type="file" accept="video/*,.ts,.mts,.m2ts,.mp4,.mov,.m4v" onchange="uploadBackupReplacementFile('${stream.id}', this)" /><span id="streamBackupUploadStatus"></span></div></div></div>
-        <div class="form-row full" id="streamBackupFileLoopRow"><label>Зациклить файл замены</label><div class="checkbox-inline"><input id="streamBackupFileLoop" type="checkbox" ${stream.backup_file_loop ? 'checked' : ''} /><span>Повторять до появления основного потока</span></div></div>
-        <div class="form-row full"><label>Тестовая таблица</label><div class="checkbox-inline"><input id="streamTestPattern" type="checkbox" ${stream.test_pattern ? 'checked' : ''} /><span>Использовать вместо входных потоков</span></div></div>
-        <div class="form-row full"><label>Интерфейс вывода</label><select class="compact" id="streamInterface" onchange="syncOutputHostWithInterface()"><option value="">Auto / все интерфейсы</option>${outputOptions}</select></div>
-        <div class="form-row full"><label>Выходные форматы</label><div id="streamOutputs" class="output-list">${renderOutputRows(outputs, links)}</div><button class="button-secondary" type="button" onclick="addStreamOutput()">+ Добавить формат</button></div>
+        <div class="form-row full"><label>${t('tileName')}</label><input class="compact" id="streamName" value="${stream.name||''}" placeholder="Belarus 5" /></div>
+        <div class="form-row full"><div class="input-main-row"><div class="form-row"><label>${t('inputUrlPrimary')}</label><input id="streamInput" value="${stream.input_uri||''}" placeholder="rtsp://camera/live, udp://@:9087, udp://239.1.1.1:1234 or https://host/live.m3u8" /></div><div class="form-row"><label>${t('inputInterface')}</label><select id="streamInputInterface"><option value="">${t('autoAllInterfaces')}</option>${inputOptions}</select></div><div class="form-row"><label>${t('inputMode')}</label><select id="streamInputMode" onchange="updateHlsSynchronizationVisibility()"><option value="auto" ${(!stream.input_mode || stream.input_mode==='auto')?'selected':''}>Auto</option><option value="hls" ${stream.input_mode==='hls'?'selected':''}>HLS</option><option value="http-ts" ${stream.input_mode==='http-ts'?'selected':''}>HTTP MPEG-TS</option><option value="caller" ${stream.input_mode==='caller'?'selected':''}>SRT Caller</option><option value="listener" ${stream.input_mode==='listener'?'selected':''}>SRT Listener</option></select></div></div></div>
+        <div class="form-row full"><label>${t('httpHlsAccess')}</label><div class="row-inline compact-row"><select id="streamHlsAccessKeyMode"><option value="none" ${(!stream.hls_access_key_mode||stream.hls_access_key_mode==='none')?'selected':''}>${t('noKey')}</option><option value="header" ${stream.hls_access_key_mode==='header'?'selected':''}>HTTP Header</option><option value="query" ${stream.hls_access_key_mode==='query'?'selected':''}>Query parameter</option></select><input id="streamHlsAccessKeyName" value="${stream.hls_access_key_name||'Authorization'}" placeholder="Authorization or token" /><input id="streamHlsAccessKeyValue" value="${stream.hls_access_key_value||''}" autocomplete="off" placeholder="Bearer TOKEN / key value" /></div><div class="row-inline compact-row" style="margin-top:8px"><input id="streamHlsUserAgent" value="${stream.hls_user_agent||'Mozilla/5.0 TVStreammerSAT5'}" placeholder="User-Agent" /></div><small>${t('keyHelpText')}</small></div>
+        <div class="form-row full" id="streamHlsSynchronizationRow" style="display:${stream.input_mode==='hls'?'':'none'}"><label>${t('hlsSync')}</label><div class="checkbox-inline"><input id="streamHlsSlowPcrAssist" type="checkbox" ${stream.hls_slow_pcr_assist ? 'checked' : ''} onchange="if(this.checked){const x=document.getElementById('streamHlsPcrPhasePacing');if(x)x.checked=false;}" /><span>${t('providerPcrClock')}</span></div><small>${t('providerPcrClockHelp')}</small><div class="checkbox-inline" style="margin-top:8px"><input id="streamHlsPcrPhasePacing" type="checkbox" ${stream.hls_pcr_phase_pacing ? 'checked' : ''} onchange="if(this.checked){const x=document.getElementById('streamHlsSlowPcrAssist');if(x)x.checked=false;}" /><span>${t('providerPcrDeadlineShaper')}</span></div><small>${t('providerPcrDeadlineShaperHelp')}</small></div>
+        <div class="form-row full" id="streamCamRow" style="display:${String(stream.input_uri||'').startsWith('dvb://')?'': 'none'}"><label>${t('camClientRow')}</label><select id="streamConditionalAccessClient">${camOptions}</select><small>${t('camClientHelp')}</small></div>
+        <div class="form-row full"><label>${t('backupSource')}</label><div class="backup-source"><select id="streamBackupInputType" onchange="updateBackupInputMode()"><option value="url" ${(!stream.backup_input_type || stream.backup_input_type==='url')?'selected':''}>${t('backupUrl')}</option><option value="file" ${stream.backup_input_type==='file'?'selected':''}>${t('replacementFile')}</option></select><input id="streamBackupInput" value="${stream.backup_input_uri||''}" placeholder="http://192.168.1.2/..." /><div class="backup-library" id="streamBackupLibrary"><button class="backup-library-button" id="streamBackupLibraryButton" type="button" onclick="toggleBackupFileLibrary()">${t('selectUploadedFile')}</button><div class="backup-library-menu" id="streamBackupLibraryMenu"></div></div><div class="backup-file-row" id="streamBackupFileRow"><input id="streamBackupFilePicker" type="file" accept="video/*,.ts,.mts,.m2ts,.mp4,.mov,.m4v" onchange="uploadBackupReplacementFile('${stream.id}', this)" /><span id="streamBackupUploadStatus"></span></div></div></div>
+        <div class="form-row full" id="streamBackupFileLoopRow"><label>${t('loopReplacementFile')}</label><div class="checkbox-inline"><input id="streamBackupFileLoop" type="checkbox" ${stream.backup_file_loop ? 'checked' : ''} /><span>${t('loopUntilPrimary')}</span></div></div>
+        <div class="form-row full"><label>${t('testPattern')}</label><div class="checkbox-inline"><input id="streamTestPattern" type="checkbox" ${stream.test_pattern ? 'checked' : ''} /><span>${t('useInsteadOfInputs')}</span></div></div>
+        <div class="form-row full"><label>${t('outputInterfaceLabel')}</label><select class="compact" id="streamInterface" onchange="syncOutputHostWithInterface()"><option value="">${t('autoAllInterfaces')}</option>${outputOptions}</select></div>
+        <div class="form-row full"><label>${t('outputFormats')}</label><div id="streamOutputs" class="output-list">${renderOutputRows(outputs, links)}</div><button class="button-secondary" type="button" onclick="addStreamOutput()">${t('addFormat')}</button></div>
         <div class="form-row full"><label>V-PID / A-PID</label><div class="row-inline compact-row"><input class="compact" id="streamVideoPid" type="number" min="16" max="8190" value="${stream.video_pid||258}" placeholder="V-PID 258" /><input class="compact" id="streamAudioPid" type="number" min="16" max="8190" value="${stream.audio_pid||257}" placeholder="A-PID 257" /></div></div>
-        <div class="form-row"><label>SID входа</label><input class="compact" id="streamInputServiceId" type="number" min="0" max="65535" value="${stream.input_service_id ?? 0}" placeholder="0 = Auto" /><small>0 = автоопределение SID из PAT; значение 1–65535 = выбрать конкретный входной канал.</small></div>
-        <div class="form-row"><label>SID выхода</label><input class="compact" id="streamServiceId" type="number" min="1" max="65535" value="${stream.service_id||1}" placeholder="1" /></div>
-        <div class="form-row full"><label>Имя Канала и Провайдер</label><div class="row-inline compact-row"><input class="compact" id="streamServiceName" value="${stream.service_name||''}" placeholder="Belarus 5" /><input class="compact" id="streamProvider" value="${stream.service_provider||''}" placeholder="BTRC" /></div></div>
-        <div class="form-row full"><label>Target bitrate (кбит/с, для CBR)</label><input id="streamBitrate" type="number" value="${Math.round((stream.target_bitrate||2000000)/1000)}" placeholder="2000" /></div>
-        <div class="form-row full"><label>Транскодирование</label><div class="checkbox-inline"><input id="streamTranscodeEnabled" type="checkbox" ${(stream.transcode_enabled && transcoderAvailable) ? 'checked' : ''} ${transcoderAvailable ? '' : 'disabled'} onchange="updateTranscodeControls()" /><span>Обрабатывать видео/аудио: транскодирование или независимый проброс оригинальных потоков</span></div><small style="color:${transcoderAvailable ? '#7ee2a8' : '#ff9f9f'}">${transcoderStatus}</small></div>
-        <div class="form-row full"><label>HLS архив (DVR)</label><div class="row-inline compact-row"><label class="checkbox-inline"><input id="streamHlsArchiveEnabled" type="checkbox" ${stream.hls_archive_enabled?'checked':''} /><span>Записывать архив</span></label><input id="streamHlsArchiveHours" type="number" min="1" max="168" value="${stream.hls_archive_hours||24}" style="max-width:110px" /><span>часов</span><input id="streamHlsArchivePath" value="${stream.hls_archive_path||'/var/lib/tvstreammersat5/archive'}" placeholder="/var/lib/tvstreammersat5/archive" /></div><small>Архив сохраняет HLS TS-сегменты на диск. Совместимые URL: /КАНАЛ/archive-UTC-ДЛИТЕЛЬНОСТЬ.m3u8, /КАНАЛ/rewind-СЕКУНДЫ.m3u8, /КАНАЛ/timeshift_rel-СЕКУНДЫ.m3u8, /КАНАЛ/timeshift_abs-UTC.m3u8.</small></div>
-        <div class="form-row full" id="streamTranscodeControls" style="display:${(stream.transcode_enabled && transcoderAvailable)?'block':'none'}"><label>Параметры транскодирования</label><div class="row-inline compact-row"><select id="streamTranscodeVideoCodec" onchange="updateTranscodeVideoControls()"><option value="h264" ${(stream.transcode_video_codec||'h264')==='h264'?'selected':''}>Видео: H.264 транскодирование</option><option value="copy" ${stream.transcode_video_codec==='copy'?'selected':''}>Видео: проброс оригинального потока</option></select><select id="streamTranscodeVideoEncoder" onchange="updateTranscodeVideoControls()"><option value="auto" ${(!stream.transcode_video_encoder||stream.transcode_video_encoder==='auto')?'selected':''}>Кодировщик: Auto (NVENC → Intel → x264)</option><option value="nvenc" ${stream.transcode_video_encoder==='nvenc'?'selected':''} ${transcoderInfo.nvenc_available?'':'disabled'}>Кодировщик: NVIDIA NVENC${transcoderInfo.nvenc_available?'':' (недоступен)'}</option><option value="intel" ${stream.transcode_video_encoder==='intel'?'selected':''} ${transcoderInfo.intel_available?'':'disabled'}>Кодировщик: Intel Quick Sync / VA${transcoderInfo.intel_available ? ` (${transcoderInfo.intel_encoder})` : ' (недоступен)'}</option><option value="x264" ${stream.transcode_video_encoder==='x264'?'selected':''} ${transcoderInfo.x264_available?'':'disabled'}>Кодировщик: CPU x264${transcoderInfo.x264_available?'':' (недоступен)'}</option></select><select id="streamTranscodeResolution" onchange="applyRecommendedTranscodeBitrate()"><option value="3840x2160" ${stream.transcode_resolution==='3840x2160'?'selected':''}>3840×2160 (4K UHD)</option><option value="3200x1800" ${stream.transcode_resolution==='3200x1800'?'selected':''}>3200×1800 (3K)</option><option value="2560x1440" ${stream.transcode_resolution==='2560x1440'?'selected':''}>2560×1440 (2K QHD)</option><option value="1920x1080" ${(!stream.transcode_resolution||stream.transcode_resolution==='1920x1080')?'selected':''}>1920×1080 (Full HD)</option><option value="1280x720" ${stream.transcode_resolution==='1280x720'?'selected':''}>1280×720 (HD)</option><option value="1024x576" ${stream.transcode_resolution==='1024x576'?'selected':''}>1024×576 (SD 16:9, квадратный пиксель)</option><option value="720x576_16_9" ${stream.transcode_resolution==='720x576_16_9'?'selected':''}>720×576 (SD 16:9, анаморфный)</option><option value="720x576" ${stream.transcode_resolution==='720x576'?'selected':''}>720×576 (PAL SD, прежний режим)</option></select><input id="streamTranscodeBitrate" type="number" min="500" max="100000" step="100" value="${Math.round((stream.transcode_video_bitrate||6000000)/1000)}" placeholder="6000" /><span>кбит/с CBR</span></div><div class="row-inline compact-row" style="margin-top:8px"><select id="streamTranscodeAudioCodec" onchange="updateTranscodeAudioControls()"><option value="copy" ${stream.transcode_audio_codec==='copy'?'selected':''}>Аудио: проброс оригинальной дорожки</option><option value="aac" ${(stream.transcode_audio_codec||'aac')==='aac'?'selected':''} ${transcoderInfo.aac_encoder?'':'disabled'}>Аудио: AAC-LC${transcoderInfo.aac_encoder?'':' (недоступен)'}</option><option value="mp3" ${stream.transcode_audio_codec==='mp3'?'selected':''} ${transcoderInfo.mp3_encoder?'':'disabled'}>Аудио: MP3${transcoderInfo.mp3_encoder?'':' (недоступен)'}</option></select><select id="streamTranscodeAudioBitrate" ${stream.transcode_audio_codec==='copy'?'disabled':''}><option value="96000" ${(stream.transcode_audio_bitrate||192000)===96000?'selected':''}>96 кбит/с</option><option value="128000" ${(stream.transcode_audio_bitrate||192000)===128000?'selected':''}>128 кбит/с</option><option value="160000" ${(stream.transcode_audio_bitrate||192000)===160000?'selected':''}>160 кбит/с</option><option value="192000" ${(stream.transcode_audio_bitrate||192000)===192000?'selected':''}>192 кбит/с</option><option value="256000" ${(stream.transcode_audio_bitrate||192000)===256000?'selected':''}>256 кбит/с</option><option value="320000" ${(stream.transcode_audio_bitrate||192000)===320000?'selected':''}>320 кбит/с</option></select><span>аудио</span></div><small>202.79: H.264 поддерживает NVIDIA NVENC, Intel Quick Sync/VA и CPU x264. Auto: NVENC → Intel → x264. Интерлейс 576i/1080i деинтерлейсится YADIF по всем полям с сохранением 50 Гц движения; SPS/PPS повторяются на каждом IDR.</small></div>
-        <div class="form-row full"><label>Автозапуск</label><div class="checkbox-inline"><input id="streamAutoStart" type="checkbox" ${stream.auto_start ? 'checked' : ''} /><span>Запускать после перезапуска программы</span></div></div>
-        <div class="form-row full" id="streamCbrRow"><label>Включить CBR</label><div class="checkbox-inline"><input id="streamCbr" type="checkbox" ${stream.cbr ? 'checked' : ''} onchange="syncUdpCbrModeFromCheckbox()" /><span>CBR</span></div><small>CBR поддерживается для UDP, HTTP, HLS и SRT.</small></div>
-        <div class="form-row full"><label>Включить Remap</label><div class="checkbox-inline"><input id="streamRemapEnabled" type="checkbox" ${stream.remap_enabled ? 'checked' : ''} /><span>Remap PID / Service</span></div><small>Для MPEG-TS: SID входа 0 = автоопределение программы из PAT; ненулевой SID выбирает конкретный входной канал. SID выхода всегда задаётся отдельно и используется для Remap в PAT/PMT/SDT. V-PID и A-PID задают выходные PID.</small></div>
+        <div class="form-row"><label>${t('inputSid')}</label><input class="compact" id="streamInputServiceId" type="number" min="0" max="65535" value="${stream.input_service_id ?? 0}" placeholder="0 = Auto" /><small>${t('inputSidHelp')}</small></div>
+        <div class="form-row"><label>${t('outputSid')}</label><input class="compact" id="streamServiceId" type="number" min="1" max="65535" value="${stream.service_id||1}" placeholder="1" /></div>
+        <div class="form-row full"><label>${t('channelNameProvider')}</label><div class="row-inline compact-row"><input class="compact" id="streamServiceName" value="${stream.service_name||''}" placeholder="Belarus 5" /><input class="compact" id="streamProvider" value="${stream.service_provider||''}" placeholder="BTRC" /></div></div>
+        <div class="form-row full"><label>${t('targetBitrateCbr')}</label><input id="streamBitrate" type="number" value="${Math.round((stream.target_bitrate||2000000)/1000)}" placeholder="2000" /></div>
+        <div class="form-row full"><label>${t('transcoding')}</label><div class="checkbox-inline"><input id="streamTranscodeEnabled" type="checkbox" ${(stream.transcode_enabled && transcoderAvailable) ? 'checked' : ''} ${transcoderAvailable ? '' : 'disabled'} onchange="updateTranscodeControls()" /><span>${t('transcodingHelp')}</span></div><small style="color:${transcoderAvailable ? '#7ee2a8' : '#ff9f9f'}">${transcoderStatus}</small></div>
+        <div class="form-row full"><label>${t('hlsArchiveDvr')}</label><div class="row-inline compact-row"><label class="checkbox-inline"><input id="streamHlsArchiveEnabled" type="checkbox" ${stream.hls_archive_enabled?'checked':''} /><span>${t('recordArchive')}</span></label><input id="streamHlsArchiveHours" type="number" min="1" max="168" value="${stream.hls_archive_hours||24}" style="max-width:110px" /><span>${t('hours')}</span><input id="streamHlsArchivePath" value="${stream.hls_archive_path||'/var/lib/tvstreammersat5/archive'}" placeholder="/var/lib/tvstreammersat5/archive" /></div><small>${t('hlsArchiveHelp')}</small></div>
+        <div class="form-row full" id="streamTranscodeControls" style="display:${(stream.transcode_enabled && transcoderAvailable)?'block':'none'}"><label>${t('transcodeParams')}</label><div class="row-inline compact-row"><select id="streamTranscodeVideoCodec" onchange="updateTranscodeVideoControls()"><option value="h264" ${(stream.transcode_video_codec||'h264')==='h264'?'selected':''}>${t('videoH264Transcode')}</option><option value="copy" ${stream.transcode_video_codec==='copy'?'selected':''}>${t('videoPassThrough')}</option></select><select id="streamTranscodeVideoEncoder" onchange="updateTranscodeVideoControls()"><option value="auto" ${(!stream.transcode_video_encoder||stream.transcode_video_encoder==='auto')?'selected':''}>${t('encoderAuto')}</option><option value="nvenc" ${stream.transcode_video_encoder==='nvenc'?'selected':''} ${transcoderInfo.nvenc_available?'':'disabled'}>${t('encoderNvenc')}${transcoderInfo.nvenc_available?'':' ('+t('unavailable')+')'}</option><option value="intel" ${stream.transcode_video_encoder==='intel'?'selected':''} ${transcoderInfo.intel_available?'':'disabled'}>${t('encoderIntel')}${transcoderInfo.intel_available ? ` (${transcoderInfo.intel_encoder})` : ' ('+t('unavailable')+')'}</option><option value="x264" ${stream.transcode_video_encoder==='x264'?'selected':''} ${transcoderInfo.x264_available?'':'disabled'}>${t('encoderX264')}${transcoderInfo.x264_available?'':' ('+t('unavailable')+')'}</option></select><select id="streamTranscodeResolution" onchange="applyRecommendedTranscodeBitrate()"><option value="3840x2160" ${stream.transcode_resolution==='3840x2160'?'selected':''}>3840×2160 (4K UHD)</option><option value="3200x1800" ${stream.transcode_resolution==='3200x1800'?'selected':''}>3200×1800 (3K)</option><option value="2560x1440" ${stream.transcode_resolution==='2560x1440'?'selected':''}>2560×1440 (2K QHD)</option><option value="1920x1080" ${(!stream.transcode_resolution||stream.transcode_resolution==='1920x1080')?'selected':''}>1920×1080 (Full HD)</option><option value="1280x720" ${stream.transcode_resolution==='1280x720'?'selected':''}>1280×720 (HD)</option><option value="1024x576" ${stream.transcode_resolution==='1024x576'?'selected':''}>1024×576 (SD 16:9, square pixel)</option><option value="720x576_16_9" ${stream.transcode_resolution==='720x576_16_9'?'selected':''}>720×576 (SD 16:9, anamorphic)</option><option value="720x576" ${stream.transcode_resolution==='720x576'?'selected':''}>720×576 (PAL SD)</option></select><input id="streamTranscodeBitrate" type="number" min="500" max="100000" step="100" value="${Math.round((stream.transcode_video_bitrate||6000000)/1000)}" placeholder="6000" /><span>${t('kbitCbr')}</span></div><div class="row-inline compact-row" style="margin-top:8px"><select id="streamTranscodeAudioCodec" onchange="updateTranscodeAudioControls()"><option value="copy" ${stream.transcode_audio_codec==='copy'?'selected':''}>${t('audioPassThrough')}</option><option value="aac" ${(stream.transcode_audio_codec||'aac')==='aac'?'selected':''} ${transcoderInfo.aac_encoder?'':'disabled'}>${t('audioAac')}${transcoderInfo.aac_encoder?'':' ('+t('unavailable')+')'}</option><option value="mp3" ${stream.transcode_audio_codec==='mp3'?'selected':''} ${transcoderInfo.mp3_encoder?'':'disabled'}>${t('audioMp3')}${transcoderInfo.mp3_encoder?'':' ('+t('unavailable')+')'}</option></select><select id="streamTranscodeAudioBitrate" ${stream.transcode_audio_codec==='copy'?'disabled':''}><option value="96000" ${(stream.transcode_audio_bitrate||192000)===96000?'selected':''}>96 kbit/s</option><option value="128000" ${(stream.transcode_audio_bitrate||192000)===128000?'selected':''}>128 kbit/s</option><option value="160000" ${(stream.transcode_audio_bitrate||192000)===160000?'selected':''}>160 kbit/s</option><option value="192000" ${(stream.transcode_audio_bitrate||192000)===192000?'selected':''}>192 kbit/s</option><option value="256000" ${(stream.transcode_audio_bitrate||192000)===256000?'selected':''}>256 kbit/s</option><option value="320000" ${(stream.transcode_audio_bitrate||192000)===320000?'selected':''}>320 kbit/s</option></select><span>${t('audio')}</span></div><small>${t('transcodeNote')}</small></div>
+        <div class="form-row full"><label>${t('autoStartStream')}</label><div class="checkbox-inline"><input id="streamAutoStart" type="checkbox" ${stream.auto_start ? 'checked' : ''} /><span>${t('autoStartStreamHelp')}</span></div></div>
+        <div class="form-row full" id="streamCbrRow"><label>${t('enableCbr')}</label><div class="checkbox-inline"><input id="streamCbr" type="checkbox" ${stream.cbr ? 'checked' : ''} onchange="syncUdpCbrModeFromCheckbox()" /><span>CBR</span></div><small>${t('cbrHelp')}</small></div>
+        <div class="form-row full"><label>${t('enableRemap')}</label><div class="checkbox-inline"><input id="streamRemapEnabled" type="checkbox" ${stream.remap_enabled ? 'checked' : ''} /><span>Remap PID / Service</span></div><small>${t('remapHelp')}</small></div>
       </div>
       <div class="modal-actions">
-        <button class="button-secondary" onclick="closeModal()">Отмена</button>
-        <button class="button-primary" onclick="saveStream('${stream.id}')">Сохранить</button>
+        <button class="button-secondary" onclick="closeModal()">${t('cancel')}</button>
+        <button class="button-primary" onclick="saveStream('${stream.id}')">${t('save')}</button>
       </div>
     `);
     document.getElementById('modalContent').classList.add('stream-modal');
@@ -5845,47 +5863,47 @@ function updateOutputHints() {
     if (!hostLabel || !portLabel || !host || !port) return;
     if (modeRow) modeRow.style.display = type === 'srt' ? '' : 'none';
     if (type === 'http' || type === 'hls') {
-      hostLabel.textContent = 'Адрес для ссылки';
-      portLabel.textContent = type === 'hls' ? 'HLS порт' : 'HTTP порт';
+      hostLabel.textContent = t('hostLabelHttp');
+      portLabel.textContent = type === 'hls' ? t('portLabelHls') : t('portLabelHttp');
       port.disabled = false;
       port.placeholder = String(state.http_port || 9000);
-      host.placeholder = 'IP интерфейса или DNS';
+      host.placeholder = t('hostPlaceholderDns');
     } else if (type === 'rtp') {
-      hostLabel.textContent = 'RTP IP / мультикаст';
-      portLabel.textContent = 'RTP порт';
+      hostLabel.textContent = t('hostLabelRtp');
+      portLabel.textContent = t('portLabelRtp');
       port.disabled = false;
       host.placeholder = '239.0.0.1';
     } else if (type === 'srt') {
-      hostLabel.textContent = outputMode === 'caller' ? 'SRT сервер' : 'SRT host для ссылки';
-      portLabel.textContent = 'SRT порт';
+      hostLabel.textContent = outputMode === 'caller' ? t('hostLabelSrtCaller') : t('hostLabelSrtListener');
+      portLabel.textContent = t('portLabelSrt');
       port.disabled = false;
       port.placeholder = '7001';
       if (!Number(port.value || 0)) port.value = '7001';
-      host.placeholder = outputMode === 'caller' ? 'server.example.com или IP' : '0.0.0.0 для listener';
+      host.placeholder = outputMode === 'caller' ? t('hostPlaceholderSrtCaller') : t('hostPlaceholderSrtListener');
       if (outputMode === 'listener' && (!host.value || host.value === '127.0.0.1' || host.value === '239.0.0.1')) {
         host.value = '0.0.0.0';
       } else if (outputMode === 'caller' && (!host.value || host.value === '0.0.0.0' || host.value === '239.0.0.1')) {
         host.value = '127.0.0.1';
       }
     } else if (type === 'rtsp') {
-      hostLabel.textContent = 'RTSP сервер';
-      portLabel.textContent = 'RTSP порт';
+      hostLabel.textContent = t('hostLabelRtsp');
+      portLabel.textContent = t('portLabelRtsp');
       port.disabled = false;
-      host.placeholder = 'rtsp://server/app/name или IP сервера';
+      host.placeholder = 'rtsp://server/app/name or server IP';
       if (!host.value || host.value === '0.0.0.0' || host.value === '239.0.0.1') host.value = '127.0.0.1';
     } else if (type === 'youtube') {
       hostLabel.textContent = 'YouTube key / URL';
-      portLabel.textContent = 'Порт';
+      portLabel.textContent = t('port');
       port.disabled = true;
-      host.placeholder = 'xxxx-xxxx-xxxx-xxxx или rtmp://a.rtmp.youtube.com/live2/...';
+      host.placeholder = 'xxxx-xxxx-xxxx-xxxx or rtmp://a.rtmp.youtube.com/live2/...';
     } else if (type === 'rtmp') {
       hostLabel.textContent = 'RTMP URL / host';
-      portLabel.textContent = 'RTMP порт';
+      portLabel.textContent = 'RTMP ' + t('port').toLowerCase();
       port.disabled = false;
-      host.placeholder = 'rtmp://server/app/key или server.example.com';
+      host.placeholder = 'rtmp://server/app/key or server.example.com';
     } else {
-      hostLabel.textContent = 'Мультикаст / UDP IP';
-      portLabel.textContent = 'UDP порт';
+      hostLabel.textContent = t('hostLabelUdp');
+      portLabel.textContent = 'UDP ' + t('port').toLowerCase();
       port.disabled = false;
       host.placeholder = '239.0.0.1';
     }
@@ -5903,8 +5921,8 @@ function updateOutputHints() {
     if (bitrateInput) bitrateInput.disabled = !cbrSupported || !cbrInput.checked;
     const hint = cbrRow.querySelector('small');
     if (hint) hint.textContent = networkCbrMode
-      ? 'CBR MPEG-TS для HTTP/HLS/SRT: NULL stuffing + PAT/PMT/PCR; HTTP/SRT дополнительно синхронизируются по PCR.'
-      : (udpMode ? 'UDP CBR использует StableUdpOutput; UDP VBR следует входному битрейту.' : 'CBR для этого типа выхода не применяется.');
+      ? t('cbrHintNetwork')
+      : (udpMode ? t('cbrHintUdp') : t('cbrHintNotApplicable'));
   }
   syncOutputHostWithInterface();
 }
@@ -6103,24 +6121,32 @@ function copyStreamLinks(id, button) {
   const text = streamLinks(stream).map(link => link.url).join('\n') || stream.vlc_link || '';
   copyLink(text, button);
 }
-const qualityPeriods = [
-  {label:'Месяц', seconds:2592000},
-  {label:'Неделя', seconds:604800},
-  {label:'День', seconds:86400},
-  {label:'Пол дня', seconds:43200},
-  {label:'5 часов', seconds:18000},
-  {label:'1 час', seconds:3600},
-  {label:'30 минут', seconds:1800},
-  {label:'10 минут', seconds:600},
-  {label:'Минута', seconds:60}
-];
-const qualityRefreshOptions = [
-  {label:'Выкл', ms:0},
-  {label:'2 сек', ms:2000},
-  {label:'5 сек', ms:5000},
-  {label:'10 сек', ms:10000},
-  {label:'30 сек', ms:30000}
-];
+function getQualityPeriods() {
+  const isRu = language === 'ru';
+  return [
+    {label:isRu ? 'Месяц' : '1 Month', seconds:2592000},
+    {label:isRu ? 'Неделя' : '1 Week', seconds:604800},
+    {label:isRu ? 'День' : '1 Day', seconds:86400},
+    {label:isRu ? 'Пол дня' : '12 Hours', seconds:43200},
+    {label:isRu ? '5 часов' : '5 Hours', seconds:18000},
+    {label:isRu ? '1 час' : '1 Hour', seconds:3600},
+    {label:isRu ? '30 минут' : '30 Min', seconds:1800},
+    {label:isRu ? '10 минут' : '10 Min', seconds:600},
+    {label:isRu ? 'Минута' : '1 Min', seconds:60}
+  ];
+}
+const qualityPeriods = getQualityPeriods();
+function getQualityRefreshOptions() {
+  const isRu = language === 'ru';
+  return [
+    {label:isRu ? 'Выкл' : 'Off', ms:0},
+    {label:isRu ? '2 сек' : '2 sec', ms:2000},
+    {label:isRu ? '5 сек' : '5 sec', ms:5000},
+    {label:isRu ? '10 сек' : '10 sec', ms:10000},
+    {label:isRu ? '30 сек' : '30 sec', ms:30000}
+  ];
+}
+const qualityRefreshOptions = getQualityRefreshOptions();
 function storedQualityRefreshMs() {
   const stored = localStorage.getItem('tvstreammersat5-quality-refresh-ms');
   const value = stored === null ? 2000 : Number(stored);
@@ -6163,7 +6189,8 @@ function qualityOutputLabel(output, index) {
   const host = String(output?.output_host || '');
   const port = Number(output?.output_port || 0);
   const endpoint = host && port ? `${host}:${port}` : (host || (port ? String(port) : ''));
-  return `Выход ${index + 1}: ${type}${endpoint ? ` ${endpoint}` : ''}`;
+  const prefix = language === 'ru' ? `Выход ${index + 1}` : `Output ${index + 1}`;
+  return `${prefix}: ${type}${endpoint ? ` ${endpoint}` : ''}`;
 }
 function qualityOutputKbps(sample, output) {
   const type = normalizedOutputType(output);
@@ -6199,37 +6226,37 @@ function openQualityModal(id, periodSeconds=3600) {
   qualityChart.selectedOutputIndex = storedQualityOutputIndex(id, Math.max(1, outputs.length));
   qualityChart.lastData = null;
   document.getElementById('modalContent').className = 'modal-content quality-modal';
-  const tabs = qualityPeriods.map(p=>`<button class="${p.seconds===periodSeconds?'active':''}" onclick="loadQualityHistory('${id}', ${p.seconds})">${p.label}</button>`).join('');
-  const refreshOptions = qualityRefreshOptions.map(option => `<option value="${option.ms}" ${option.ms===qualityChart.refreshMs?'selected':''}>${option.label}</option>`).join('');
+  const tabs = getQualityPeriods().map(p=>`<button class="${p.seconds===periodSeconds?'active':''}" onclick="loadQualityHistory('${id}', ${p.seconds})">${p.label}</button>`).join('');
+  const refreshOptions = getQualityRefreshOptions().map(option => `<option value="${option.ms}" ${option.ms===qualityChart.refreshMs?'selected':''}>${option.label}</option>`).join('');
   const outputOptions = (outputs.length ? outputs : [{output_type:'udp', output_host:'', output_port:0, cbr:false}])
     .map((output, index) => `<option value="${index}" ${index===qualityChart.selectedOutputIndex?'selected':''}>${escapeHtmlValue(qualityOutputLabel(output, index))}</option>`).join('');
   document.getElementById('modalContent').innerHTML = modalCloseButton() + `
     <div class="quality-head">
       <div class="quality-title">
-        <h2>Качество потока</h2>
+        <h2>${t('streamQuality')}</h2>
         <small>${escapeHtmlValue(stream.name || stream.id)}</small>
       </div>
       <div class="quality-toolbar">
-        <label class="quality-output-select"><span>Исходящий поток</span><select id="qualityOutputSelect" onchange="setQualityOutputIndex(Number(this.value))">${outputOptions}</select></label>
+        <label class="quality-output-select"><span>${t('outgoingStream')}</span><select id="qualityOutputSelect" onchange="setQualityOutputIndex(Number(this.value))">${outputOptions}</select></label>
         <div class="period-tabs">${tabs}</div>
-        <label class="quality-refresh"><span>Автообновление</span><select onchange="setQualityAutoRefresh(Number(this.value))">${refreshOptions}</select></label>
+        <label class="quality-refresh"><span>${t('autoRefresh')}</span><select onchange="setQualityAutoRefresh(Number(this.value))">${refreshOptions}</select></label>
       </div>
     </div>
     <div id="qualityCharts" class="quality-charts"></div>
     <div class="quality-decode">
-      <strong>Расшифровка</strong>
-      <span><i class="quality-line quality-input"></i> Зеленый — входной bitrate по левой шкале Mbit/s.</span>
-      <span><i class="quality-line quality-output"></i> Синий — bitrate выбранного исходящего потока по левой шкале Mbit/s.</span>
-      <span><i class="quality-line quality-input-cc"></i> Оранжевые столбцы — количество входных CC-errors за интервал истории по правой шкале.</span>
-      <span><i class="quality-line quality-output-cc"></i> Розовые столбцы — CC-errors общего выходного MPEG-TS до разветвления за интервал истории.</span>
-      <span>CC-errors считаются по накопительным счетчикам между соседними точками истории; ошибки внутри 30-секундного интервала больше не теряются.</span>
-      <span>Клик по графику копирует картинку графика.</span>
+      <strong>${t('legend')}</strong>
+      <span><i class="quality-line quality-input"></i> ${t('legendGreen')}</span>
+      <span><i class="quality-line quality-output"></i> ${t('legendBlue')}</span>
+      <span><i class="quality-line quality-input-cc"></i> ${t('legendOrange')}</span>
+      <span><i class="quality-line quality-output-cc"></i> ${t('legendPink')}</span>
+      <span>${t('legendCcNote')}</span>
+      <span>${t('legendClick')}</span>
     </div>
     <div id="qualityCopyNotice" class="quality-copy"></div>
     <div id="qualityDetails" class="quality-details"></div>
     <div id="qualityErrors" class="quality-errors"></div>
     <div class="modal-actions">
-      <button class="button-secondary" onclick="closeModal()">Закрыть</button>
+      <button class="button-secondary" onclick="closeModal()">${t('close')}</button>
     </div>
   `;
   updateHeaderHeight();
@@ -6286,7 +6313,7 @@ function ensureQualityChartBoard(output, index) {
       <div class="quality-output-chart">
         <div class="quality-output-chart-head">
           <strong>${escapeHtmlValue(qualityOutputLabel(output, index))}</strong>
-          <span>${index === 0 ? 'Основной выход' : 'Дополнительный выход'}</span>
+          <span>${index === 0 ? (language === 'ru' ? 'Основной выход' : 'Primary output') : (language === 'ru' ? 'Дополнительный выход' : 'Auxiliary output')}</span>
         </div>
         <div class="quality-board">
           <canvas id="qualityCanvas" width="1160" height="320" data-quality-output-index="${index}"></canvas>
@@ -6321,7 +6348,7 @@ function drawQualityChart(data) {
   ctx.fillStyle = '#0f1622';
   ctx.fillRect(0, 0, width, height);
 
-  const streamName = stream.name || data.id || 'Поток';
+  const streamName = stream.name || data.id || (language === 'ru' ? 'Поток' : 'Stream');
   const edgeTime = ts => {
     const date = new Date(ts * 1000);
     const day = String(date.getDate()).padStart(2, '0');
@@ -6336,7 +6363,7 @@ function drawQualityChart(data) {
     const digits = mbps >= 10 ? 2 : 3;
     return `${Number(mbps.toFixed(digits))} Mbit/s`;
   };
-  const formatMetricNumber = value => Number(value || 0).toLocaleString('ru-RU', {maximumFractionDigits: 3});
+  const formatMetricNumber = value => Number(value || 0).toLocaleString(language === 'ru' ? 'ru-RU' : 'en-US', {maximumFractionDigits: 3});
   const statsFor = values => {
     const normalized = values.map(value => Number(value || 0));
     if (!normalized.length) return {last:0, min:0, avg:0, max:0};
@@ -6361,9 +6388,9 @@ function drawQualityChart(data) {
     ctx.fillStyle = '#cfd8ea';
     ctx.font = '700 13px Arial';
     ctx.textAlign = 'center';
-    ctx.fillText('История пока пустая. Данные появятся после нескольких обновлений состояния.', width / 2, height / 2);
+    ctx.fillText(t('historyEmptyWaiting'), width / 2, height / 2);
     canvas.onclick = () => copyQualityChartImage(canvas);
-    details.innerHTML = '<div class="quality-card"><strong>Нет данных</strong>История собирается в памяти во время работы приложения.</div>';
+    details.innerHTML = `<div class="quality-card"><strong>${t('noData')}</strong>${t('historyCollectedInMemory')}</div>`;
     errors.innerHTML = '';
     return;
   }
@@ -6516,11 +6543,11 @@ function drawQualityChart(data) {
   const outputCcStats = statsFor(outputCcValues);
   details.innerHTML = `
     <div class="quality-stats">
-      <div></div><div></div><div class="head">посл</div><div class="head">мин</div><div class="head">сред</div><div class="head">макс</div>
-      ${statsRow('quality-input', `${streamName} — входной bitrate`, '[input]', inputBitrateStats, formatMbitValue)}
+      <div></div><div></div><div class="head">${language === 'ru' ? 'посл' : 'last'}</div><div class="head">${language === 'ru' ? 'мин' : 'min'}</div><div class="head">${language === 'ru' ? 'сред' : 'avg'}</div><div class="head">${language === 'ru' ? 'макс' : 'max'}</div>
+      ${statsRow('quality-input', `${streamName} — ${language === 'ru' ? 'входной bitrate' : 'input bitrate'}`, '[input]', inputBitrateStats, formatMbitValue)}
       ${statsRow('quality-output', `${streamName} — ${qualityOutputLabel(output, selectedIndex)}`, `[out ${selectedIndex + 1}]`, outputBitrateStats, formatMbitValue)}
-      ${statsRow('quality-input-cc', `${streamName} — входные CC-errors за интервал`, '[input]', inputCcStats, value => formatMetricNumber(value))}
-      ${statsRow('quality-output-cc', `${streamName} — выходные CC-errors за интервал (общий TS)`, '[output]', outputCcStats, value => formatMetricNumber(value))}
+      ${statsRow('quality-input-cc', `${streamName} — ${language === 'ru' ? 'входные CC-errors за интервал' : 'input CC-errors per interval'}`, '[input]', inputCcStats, value => formatMetricNumber(value))}
+      ${statsRow('quality-output-cc', `${streamName} — ${language === 'ru' ? 'выходные CC-errors за интервал (общий TS)' : 'output CC-errors per interval (total TS)'}`, '[output]', outputCcStats, value => formatMetricNumber(value))}
     </div>
   `;
   const bad = samples.filter(s => s.level !== 'ok' || Number(s.input_cc_errors ?? s.cc_errors ?? 0) > 0 || Number(s.output_cc_errors || 0) > 0).slice(-30).reverse();
@@ -6531,7 +6558,7 @@ function drawQualityChart(data) {
         const markerColor = outputCc > 0 ? '#ff4f9a' : (inputCc > 0 ? '#ff9f1a' : qualityColor(s.level));
         return `<div><span style="color:${markerColor}">●</span><span>${formatTime(s.ts, data.period_seconds)}</span><span>${s.message} · CC input: ${inputCc} · CC output: ${outputCc}</span></div>`;
       }).join('')
-    : '<div><span style="color:#17c261">●</span><span>За выбранный период входных и выходных CC-errors и других ошибок нет</span></div>';
+    : `<div><span style="color:#17c261">●</span><span>${language === 'ru' ? 'За выбранный период входных и выходных CC-errors и других ошибок нет' : 'No input/output CC-errors or other stream errors during selected period'}</span></div>`;
 }
 
 function copyQualityChartImage(canvas) {
@@ -6543,7 +6570,7 @@ function copyQualityChartImage(canvas) {
     notice.copyTimer = setTimeout(()=>{ notice.textContent = ''; }, 1800);
   };
   if (!canvas || !navigator.clipboard || !window.ClipboardItem || !window.isSecureContext) {
-    show('Браузер не разрешил копировать картинку графика');
+    show(language === 'ru' ? 'Браузер не разрешил копировать картинку графика' : 'Browser denied clipboard copy');
     return;
   }
   let item;
@@ -6553,12 +6580,12 @@ function copyQualityChartImage(canvas) {
     });
     item = new ClipboardItem({'image/png': png});
   } catch (error) {
-    show('Браузер не поддерживает копирование картинки графика');
+    show(language === 'ru' ? 'Браузер не поддерживает копирование картинки графика' : 'Browser does not support chart copy');
     return;
   }
   navigator.clipboard.write([item])
-    .then(() => show('Картинка графика скопирована в буфер обмена'))
-    .catch(() => show('Не удалось скопировать картинку графика'));
+    .then(() => show(language === 'ru' ? 'Картинка графика скопирована в буфер обмена' : 'Chart image copied to clipboard'))
+    .catch(() => show(language === 'ru' ? 'Не удалось скопировать картинку графика' : 'Failed to copy chart image'));
 }
 function loadInterfaces() {
   return fetch('/api/interfaces')
@@ -6591,7 +6618,7 @@ window.addEventListener('beforeunload', () => {
 
   function chooseHttpSource(payload) {
     var sources = Array.isArray(payload) ? payload : payload && payload.sources;
-    if (!Array.isArray(sources)) throw Error('Ответ preview API должен содержать массив sources');
+    if (!Array.isArray(sources)) throw Error(language === 'ru' ? 'Ответ preview API должен содержать массив sources' : 'Preview API response must contain a sources array');
     var source = sources.find(function (s) {
       return s && String(s.kind || s.type || '').toLowerCase() === 'http' &&
         String(s.preview_kind || s.previewKind || '').toLowerCase() === 'mpegts' &&
@@ -6621,19 +6648,19 @@ window.addEventListener('beforeunload', () => {
     if (!raw) return null;
     var url;
     try { url = new URL(raw, base); }
-    catch (_) { throw Error('Некорректный адрес HTTP-предпросмотра'); }
+    catch (_) { throw Error(language === 'ru' ? 'Некорректный адрес HTTP-предпросмотра' : 'Invalid HTTP preview address'); }
     if (url.protocol !== 'http:' && url.protocol !== 'https:') {
-      throw Error('Адрес предпросмотра должен быть HTTP(S)');
+      throw Error(language === 'ru' ? 'Адрес предпросмотра должен быть HTTP(S)' : 'Preview address must be HTTP(S)');
     }
     if (!allowCrossOrigin && url.origin !== new URL(base).origin) {
-      throw Error('Предпросмотр должен выдаваться веб-сервером TVStreammer (same-origin)');
+      throw Error(language === 'ru' ? 'Предпросмотр должен выдаваться веб-сервером TVStreammer (same-origin)' : 'Preview must be served by TVStreammer web server (same-origin)');
     }
     return url.href;
   }
 
   function newSessionToken() {
     if (!window.crypto || typeof window.crypto.getRandomValues !== 'function') {
-      throw Error('Браузер не поддерживает безопасный токен HTTP-предпросмотра');
+      throw Error(language === 'ru' ? 'Браузер не поддерживает безопасный токен HTTP-предпросмотра' : 'Browser does not support secure HTTP preview token');
     }
     var bytes = new Uint8Array(16);
     window.crypto.getRandomValues(bytes);
@@ -6665,7 +6692,7 @@ window.addEventListener('beforeunload', () => {
 
   function install(options) {
     if (typeof document === 'undefined' || typeof window === 'undefined') {
-      throw Error('install() запускается только в браузере');
+      throw Error(language === 'ru' ? 'install() запускается только в браузере' : 'install() runs only in a browser');
     }
     options = options || {};
     var selector = options.tileSelector || '[data-stream-id]';
@@ -6729,23 +6756,23 @@ window.addEventListener('beforeunload', () => {
           activeHls = player;
           player.on(window.Hls.Events.ERROR, function (_event, data) {
             if (activeHls === player && data && data.fatal) {
-              message('Ошибка HLS: ' + String(data.details || data.type || 'нет данных'), true);
+              message((language === 'ru' ? 'Ошибка HLS: ' : 'HLS error: ') + String(data.details || data.type || (language === 'ru' ? 'нет данных' : 'no data')), true);
             }
           });
           player.attachMedia(video);
           player.loadSource(url);
         } else {
-          message('Для HLS необходима поддержка браузера или локальная hls.js.', true);
+          message(language === 'ru' ? 'Для HLS необходима поддержка браузера или локальная hls.js.' : 'HLS requires browser support or local hls.js.', true);
           return;
         }
-        message('HLS · ' + source.label + ' · звук включается в плеере');
-        Promise.resolve(video.play()).catch(function () { message('Нажмите ▶ для запуска видео.'); });
-      } catch (error) { resetMedia(); message('Ошибка HLS: ' + error.message, true); }
+        message('HLS · ' + source.label + ' · ' + (language === 'ru' ? 'звук включается в плеере' : 'unmute audio in player'));
+        Promise.resolve(video.play()).catch(function () { message(language === 'ru' ? 'Нажмите ▶ для запуска видео.' : 'Click ▶ to start playback.'); });
+      } catch (error) { resetMedia(); message((language === 'ru' ? 'Ошибка HLS: ' : 'HLS error: ') + error.message, true); }
     }
 
     function playHttp(payload, streamId) {
       if (payload && payload.active === false) {
-        message('Поток остановлен: временный HTTP-предпросмотр недоступен.', true);
+        message(language === 'ru' ? 'Поток остановлен: временный HTTP-предпросмотр недоступен.' : 'Stream is stopped: temporary HTTP preview unavailable.', true);
         return;
       }
       var hls = chooseHlsSource(payload);
@@ -6760,7 +6787,7 @@ window.addEventListener('beforeunload', () => {
       var source = chooseHttpSource(payload);
       if (!source && hls && canHls) { playHls(hls); return; }
       if (!source) {
-        message('Временный HTTP-предпросмотр недоступен для этого канала.', true);
+        message(language === 'ru' ? 'Временный HTTP-предпросмотр недоступен для этого канала.' : 'Temporary HTTP preview is unavailable for this channel.', true);
         return;
       }
       var url;
@@ -6777,7 +6804,7 @@ window.addEventListener('beforeunload', () => {
       } catch (error) { message(error.message, true); return; }
       if (!window.mpegts || !window.mpegts.getFeatureList ||
           !window.mpegts.getFeatureList().mseLivePlayback) {
-        message('Для HTTP MPEG-TS необходимы локальная mpegts.js и поддержка MediaSource.', true);
+        message(language === 'ru' ? 'Для HTTP MPEG-TS необходимы локальная mpegts.js и поддержка MediaSource.' : 'HTTP MPEG-TS requires local mpegts.js and MediaSource support.', true);
         return;
       }
       try {
@@ -6794,20 +6821,19 @@ window.addEventListener('beforeunload', () => {
             resetMedia();
             playHls(hls);
           } else {
-            message('Ошибка HTTP MPEG-TS: ' + String(detail || 'нет данных') +
-              '. Проверьте кодеки канала и доступность новых видеокадров.', true);
+            message((language === 'ru' ? 'Ошибка HTTP MPEG-TS: ' : 'HTTP MPEG-TS error: ') + String(detail || (language === 'ru' ? 'нет данных' : 'no data')) +
+              (language === 'ru' ? '. Проверьте кодеки канала и доступность новых видеокадров.' : '. Check channel codecs and availability of video frames.'), true);
           }
         });
         player.attachMediaElement(video);
         player.load();
-        message('HTTP MPEG-TS · ' + source.label + ' · звук включается в плеере. ' +
-          'Для спутникового MPEG-2/AC3 браузеру может потребоваться H.264/AAC-превью.');
+        message('HTTP MPEG-TS · ' + source.label + ' · ' + (language === 'ru' ? 'звук включается в плеере. Для спутникового MPEG-2/AC3 браузеру может потребоваться H.264/AAC-превью.' : 'unmute audio in player. Satellite MPEG-2/AC3 may require H.264/AAC preview.'));
         Promise.resolve(player.play()).catch(function () {
-          if (activeTs === player) message('Нажмите ▶ для запуска видео.');
+          if (activeTs === player) message(language === 'ru' ? 'Нажмите ▶ для запуска видео.' : 'Click ▶ to start playback.');
         });
       } catch (error) {
         resetMedia();
-        message('Ошибка HTTP MPEG-TS: ' + error.message, true);
+        message((language === 'ru' ? 'Ошибка HTTP MPEG-TS: ' : 'HTTP MPEG-TS error: ') + error.message, true);
       }
     }
     function open(streamId, streamName) {
@@ -6819,20 +6845,20 @@ window.addEventListener('beforeunload', () => {
       var dialog = element('section', 'tvp-dialog');
       dialog.setAttribute('role', 'dialog');
       dialog.setAttribute('aria-modal', 'true');
-      dialog.setAttribute('aria-label', 'HTTP-предпросмотр потока');
+      dialog.setAttribute('aria-label', t('previewDialogAria'));
       var header = element('div', 'tvp-header');
-      var title = element('h2', 'tvp-title', streamName || ('Поток ' + streamId));
+      var title = element('h2', 'tvp-title', streamName || (language === 'ru' ? ('Поток ' + streamId) : ('Stream ' + streamId)));
       var closeBtn = element('button', 'tvp-close', '×');
       closeBtn.type = 'button';
-      closeBtn.setAttribute('aria-label', 'Закрыть предпросмотр');
+      closeBtn.setAttribute('aria-label', t('closePreview'));
       closeBtn.addEventListener('click', close);
       header.append(title, closeBtn);
       video = element('video', 'tvp-video');
       video.controls = true;
       video.playsInline = true;
       video.preload = 'none';
-      video.setAttribute('aria-label', 'HTTP-предпросмотр');
-      status = element('div', 'tvp-status', 'Подключение к HTTP-потоку…');
+      video.setAttribute('aria-label', t('previewDialogAria'));
+      status = element('div', 'tvp-status', t('connectingHttpPreview'));
       dialog.append(header, video, status);
       modal.append(dialog);
       modal.addEventListener('mousedown', function (event) { if (event.target === modal) close(); });
@@ -6847,7 +6873,7 @@ window.addEventListener('beforeunload', () => {
         }).catch(function (error) {
           if (serial !== requestSerial || !modal || error.name === 'AbortError') return;
           activeRequest = null;
-          message('Не удалось получить HTTP-предпросмотр: ' + error.message, true);
+          message((language === 'ru' ? 'Не удалось получить HTTP-предпросмотр: ' : 'Failed to get HTTP preview: ') + error.message, true);
         });
     }
     function onDblClick(event) {
